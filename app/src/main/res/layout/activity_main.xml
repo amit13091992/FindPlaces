@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activity.MainActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/idAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+
+        </android.support.v7.widget.Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <GridView
+        android:id="@+id/gridview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@id/idAppBar"
+        android:layout_marginTop="10dp"
+        android:columnWidth="90dp"
+        android:gravity="center"
+        android:horizontalSpacing="10dp"
+        android:numColumns="2"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="10dp" />
+    <!--<Button-->
+    <!--android:id="@+id/idBtnHospital"-->
+    <!--style="@style/Widget.AppCompat.Button.Colored"-->
+    <!--android:layout_width="@dimen/btn_widt_height"-->
+    <!--android:layout_height="@dimen/btn_widt_height"-->
+    <!--android:layout_alignLeft="@+id/idBtnBars"-->
+    <!--android:layout_alignTop="@+id/idBtnHotel"-->
+    <!--android:layout_marginLeft="2dp"-->
+    <!--android:layout_marginTop="1dp"-->
+    <!--android:text="Hospitals"-->
+    <!--android:textAllCaps="false"-->
+    <!--android:textSize="18sp" />-->
+
+    <!--<Button-->
+    <!--android:id="@+id/idBtnHotel"-->
+    <!--style="@style/Widget.AppCompat.Button.Colored"-->
+    <!--android:layout_width="@dimen/btn_widt_height"-->
+    <!--android:layout_height="@dimen/btn_widt_height"-->
+    <!--android:layout_alignLeft="@+id/idBtnATM"-->
+    <!--android:layout_alignParentTop="true"-->
+    <!--android:layout_marginLeft="-2dp"-->
+    <!--android:layout_marginTop="87dp"-->
+    <!--android:text="Hotel"-->
+    <!--android:textAllCaps="false"-->
+    <!--android:textSize="18sp" />-->
+
+    <!--<Button-->
+    <!--android:id="@+id/idBtnATM"-->
+    <!--style="@style/Widget.AppCompat.Button.Colored"-->
+    <!--android:layout_width="@dimen/btn_widt_height"-->
+    <!--android:layout_height="@dimen/btn_widt_height"-->
+    <!--android:layout_alignTop="@+id/idBtnBars"-->
+    <!--android:layout_alignParentEnd="true"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:layout_marginTop="-1dp"-->
+    <!--android:layout_marginEnd="45dp"-->
+    <!--android:layout_marginRight="45dp"-->
+    <!--android:text="ATM"-->
+    <!--android:textAllCaps="false"-->
+    <!--android:textSize="18sp" />-->
+
+    <!--<Button-->
+    <!--android:id="@+id/idBtnBars"-->
+    <!--style="@style/Widget.AppCompat.Button.Colored"-->
+    <!--android:layout_width="@dimen/btn_widt_height"-->
+    <!--android:layout_height="@dimen/btn_widt_height"-->
+    <!--android:layout_alignParentStart="true"-->
+    <!--android:layout_alignParentLeft="true"-->
+    <!--android:layout_alignParentBottom="true"-->
+    <!--android:layout_marginStart="48dp"-->
+    <!--android:layout_marginLeft="48dp"-->
+    <!--android:layout_marginBottom="134dp"-->
+    <!--android:text="Bars"-->
+    <!--android:textAllCaps="false"-->
+    <!--android:textSize="18sp" />-->
+</RelativeLayout>

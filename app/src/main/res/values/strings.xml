@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">FindPlaces</string>
+
+    <!-- place names strings -->
+    <string name="hospitals">Hospital</string>
+    <string name="hotels">Hotel</string>
+    <string name="ATM">ATM</string>
+    <string name="bars">Bars</string>
+    <string name="GPSAlertDialogTitle">GPS Alert</string>
+    <string name="GPSAlertDialogMessage">Turn On GPS</string>
+    <string name="action_settings">Settings</string>
+    <string name="cancel">Cancel</string>
+
+    <array name="placeNames">
+        <item>@string/hospitals</item>
+        <item>@string/hotels</item>
+        <item>@string/ATM</item>
+        <item>@string/bars</item>
+    </array>
+
+    <integer-array name="places_icons">
+        <item>@drawable/ic_hospital</item>
+        <item>@drawable/ic_hotel</item>
+        <item>@drawable/ic_atm</item>
+        <item>@drawable/ic_bars</item>
+    </integer-array>
+
+</resources>

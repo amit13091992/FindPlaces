@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/idName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Res Name"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/idRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Rating"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/idAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Address"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/idPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Phone"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/idDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Distance"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/idCurrentLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Current Location"
+        android:textSize="16sp" />
+
+    <ImageView
+        android:id="@+id/idImage"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:padding="5dp"
+        android:text="Place Image"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+
+</LinearLayout>

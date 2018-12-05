@@ -20,8 +20,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
@@ -29,7 +33,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
@@ -42,6 +45,11 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
     private static final int RC_FINE = 123;
     private static final String[] LOCATION_FINE_CORSE =
             {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+    double currentLat, currentLong;
+    RecyclerView recyclerView;
+    ProgressBar progressBar;
+    LinearLayout errorLayout;
+    Button btnRetry;
     private String coOrdinates;
     private HospitalListAdapter hospitalListAdapter;
     private GPSTracker gpsTracker;
@@ -51,7 +59,10 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hospitals);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.placeslist_recyclerview);
+        recyclerView = (RecyclerView) findViewById(R.id.placeslist_recyclerview);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        errorLayout = (LinearLayout) findViewById(R.id.idErrorLayout);
+        btnRetry = (Button) findViewById(R.id.idBtnRetry);
         setSupportActionBar(toolbar);
         toolbar.setTitle("nearby Hospitals");
         setSupportActionBar(toolbar);
@@ -61,10 +72,38 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
             window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
         }
         // check if GPS enable
-        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        gpsTracker = new GPSTracker(this);
+        if (gpsTracker.getIsGPSTrackingEnabled() && checkLocationPermission() && hasLocationAndContactsPermissions()) {
+            currentLat = gpsTracker.getLatitude();
+            currentLong = gpsTracker.getLongitude();
+            getNearByHospitals();
+            coOrdinates = currentLat + "," + currentLong;
+            try {
+                URLEncoder.encode(coOrdinates, "utf-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        } else {
+            EasyPermissions.requestPermissions(
+                    this, "Permissions needed ...",
+                    RC_FINE,
+                    LOCATION_FINE_CORSE);
+        }
+
+        LinearLayoutManager llm = new LinearLayoutManager(HospitalsActivity.this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(llm);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
-        recyclerView.setAdapter(hospitalListAdapter);
+
+        btnRetry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                errorLayout.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
+                getNearByHospitals();
+            }
+        });
     }
 
     public boolean checkLocationPermission() {
@@ -81,7 +120,7 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
     }
 
     private void getNearByHospitals() {
-        fetchCurrentLocation();
+        progressBar.setVisibility(View.VISIBLE);
         ApiInterface apiService =
                 ApiClient.getClient().create(ApiInterface.class);
         Call<GooglePlacesResponse.Root> call = apiService.getHospitals(
@@ -96,14 +135,20 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
                     Log.d(TAG, " response: " + response.body());
                     assert root != null;
                     if (root.status.equals("OK")) {
+                        progressBar.setVisibility(View.GONE);
                         ArrayList<GooglePlacesResponse.CustomA> results = root.customA;
                         for (int i = 0; i < results.size(); i++) {
                             hospitalListAdapter = new HospitalListAdapter(results, getApplicationContext());
+                            recyclerView.setAdapter(hospitalListAdapter);
                         }
                     } else {
+                        progressBar.setVisibility(View.GONE);
+                        errorLayout.setVisibility(View.VISIBLE);
                         Toast.makeText(getApplicationContext(), "No matches found near you, Please Retry!!!", Toast.LENGTH_SHORT).show();
                     }
                 } else if (response.code() != 200) {
+                    progressBar.setVisibility(View.GONE);
+                    errorLayout.setVisibility(View.VISIBLE);
                     Toast.makeText(getApplicationContext(), "Error code: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
 
@@ -121,29 +166,6 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
 
     private boolean hasLocationAndContactsPermissions() {
         return EasyPermissions.hasPermissions(this, LOCATION_FINE_CORSE);
-    }
-
-    @AfterPermissionGranted(RC_FINE)
-    public void fetchCurrentLocation() {
-        gpsTracker = new GPSTracker(this);
-        if (gpsTracker.getIsGPSTrackingEnabled() && checkLocationPermission() && hasLocationAndContactsPermissions()) {
-            double currentLat = gpsTracker.getLatitude();
-            double currentLong = gpsTracker.getLongitude();
-            getNearByHospitals();
-            coOrdinates = currentLat + "," + currentLong;
-            try {
-                URLEncoder.encode(coOrdinates, "utf-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        } else {
-//            gpsTracker.showSettingsAlert();
-            // Ask for both permissions
-            EasyPermissions.requestPermissions(
-                    this, "Permissions needed ...",
-                    RC_FINE,
-                    LOCATION_FINE_CORSE);
-        }
     }
 
     @Override

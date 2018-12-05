@@ -50,7 +50,7 @@ public class HospitalListAdapter extends RecyclerView.Adapter<HospitalListAdapte
 
     @Override
     public int getItemCount() {
-        return stLstStores.size() + 1;
+        return stLstStores.size();
 
     }
 

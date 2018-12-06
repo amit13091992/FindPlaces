@@ -14,14 +14,6 @@
         android:textSize="16sp" />
 
     <TextView
-        android:id="@+id/idRating"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:text="Rating"
-        android:textSize="16sp" />
-
-    <TextView
         android:id="@+id/idAddress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -30,6 +22,16 @@
         android:textSize="16sp" />
 
     <TextView
+        android:id="@+id/idRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Rating"
+        android:textSize="16sp" />
+
+
+    <TextView
+        android:visibility="gone"
         android:id="@+id/idPhone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -37,7 +39,7 @@
         android:text="Phone"
         android:textSize="16sp" />
 
-    <TextView
+    <TextView android:visibility="gone"
         android:id="@+id/idDistance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -50,6 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
+        android:visibility="gone"
         android:text="Current Location"
         android:textSize="16sp" />
 

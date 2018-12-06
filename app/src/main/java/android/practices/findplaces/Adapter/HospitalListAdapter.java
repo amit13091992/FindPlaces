@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 public class HospitalListAdapter extends RecyclerView.Adapter<HospitalListAdapter.MyViewHolder> {
     Context context;
     private ArrayList<GooglePlacesResponse.CustomA> stLstStores;
-    private ClickListener listener;
 
     public HospitalListAdapter(ArrayList<GooglePlacesResponse.CustomA> stLstStores, Context context) {
         this.stLstStores = stLstStores;

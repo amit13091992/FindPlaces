@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.practices.findplaces.Adapter.HospitalListAdapter;
 import android.practices.findplaces.Constants.AppConstants;
 import android.practices.findplaces.Models.GooglePlacesResponse;
@@ -58,6 +57,7 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
     TextView lblNoInternetText;
     ConnectivityReceiver connectivityReceiver;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    GooglePlacesResponse.CustomA location;
     private String coOrdinates;
     private HospitalListAdapter hospitalListAdapter;
     private GPSTracker gpsTracker;
@@ -110,12 +110,6 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
             }
         }
 
-        LinearLayoutManager llm = new LinearLayoutManager(HospitalsActivity.this);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(llm);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL);
-        recyclerView.addItemDecoration(dividerItemDecoration);
-
         btnRetry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -135,9 +129,12 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
         recyclerView.addOnItemTouchListener(new HospitalListAdapter.RecyclerTouchListener(getApplicationContext(), recyclerView, new HospitalListAdapter.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                Intent mapIntent = new Intent(HospitalsActivity.this, MyActivity.class);
-                //mapIntent.putExtra("mapsData", (Parcelable) gpsTracker);
-                 startActivity(mapIntent);
+                String latitude = location.geometry.locationA.lat;
+                String longitude = location.geometry.locationA.lng;
+                Intent mapIntent = new Intent(HospitalsActivity.this, ShowLocationOnMapActivity.class);
+                mapIntent.putExtra("latitude", latitude);
+                mapIntent.putExtra("longitude", longitude);
+                startActivity(mapIntent);
             }
 
             @Override
@@ -181,11 +178,14 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
                         for (int i = 0; i < results.size(); i++) {
                             hospitalListAdapter = new HospitalListAdapter(results, getApplicationContext());
                         }
+                        LinearLayoutManager llm = new LinearLayoutManager(HospitalsActivity.this);
+                        recyclerView.setLayoutManager(llm);
+                        recyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL));
                         recyclerView.setAdapter(hospitalListAdapter);
                     } else {
-                        progressBar.setVisibility(View.GONE);
                         errorLayout.setVisibility(View.VISIBLE);
-                        Toast.makeText(getApplicationContext(), "No matches found near you, Please Retry!!!", Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
+                        //Toast.makeText(getApplicationContext(), "No matches found near you, Please Retry!!!", Toast.LENGTH_SHORT).show();
                     }
                 } else if (response.code() != 200) {
                     progressBar.setVisibility(View.GONE);

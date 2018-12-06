@@ -36,59 +36,27 @@
         android:numColumns="2"
         android:stretchMode="columnWidth"
         android:verticalSpacing="10dp" />
-    <!--<Button-->
-    <!--android:id="@+id/idBtnHospital"-->
-    <!--style="@style/Widget.AppCompat.Button.Colored"-->
-    <!--android:layout_width="@dimen/btn_widt_height"-->
-    <!--android:layout_height="@dimen/btn_widt_height"-->
-    <!--android:layout_alignLeft="@+id/idBtnBars"-->
-    <!--android:layout_alignTop="@+id/idBtnHotel"-->
-    <!--android:layout_marginLeft="2dp"-->
-    <!--android:layout_marginTop="1dp"-->
-    <!--android:text="Hospitals"-->
-    <!--android:textAllCaps="false"-->
-    <!--android:textSize="18sp" />-->
 
-    <!--<Button-->
-    <!--android:id="@+id/idBtnHotel"-->
-    <!--style="@style/Widget.AppCompat.Button.Colored"-->
-    <!--android:layout_width="@dimen/btn_widt_height"-->
-    <!--android:layout_height="@dimen/btn_widt_height"-->
-    <!--android:layout_alignLeft="@+id/idBtnATM"-->
-    <!--android:layout_alignParentTop="true"-->
-    <!--android:layout_marginLeft="-2dp"-->
-    <!--android:layout_marginTop="87dp"-->
-    <!--android:text="Hotel"-->
-    <!--android:textAllCaps="false"-->
-    <!--android:textSize="18sp" />-->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="-25dp"
+        android:visibility="gone" />
 
-    <!--<Button-->
-    <!--android:id="@+id/idBtnATM"-->
-    <!--style="@style/Widget.AppCompat.Button.Colored"-->
-    <!--android:layout_width="@dimen/btn_widt_height"-->
-    <!--android:layout_height="@dimen/btn_widt_height"-->
-    <!--android:layout_alignTop="@+id/idBtnBars"-->
-    <!--android:layout_alignParentEnd="true"-->
-    <!--android:layout_alignParentRight="true"-->
-    <!--android:layout_marginTop="-1dp"-->
-    <!--android:layout_marginEnd="45dp"-->
-    <!--android:layout_marginRight="45dp"-->
-    <!--android:text="ATM"-->
-    <!--android:textAllCaps="false"-->
-    <!--android:textSize="18sp" />-->
-
-    <!--<Button-->
-    <!--android:id="@+id/idBtnBars"-->
-    <!--style="@style/Widget.AppCompat.Button.Colored"-->
-    <!--android:layout_width="@dimen/btn_widt_height"-->
-    <!--android:layout_height="@dimen/btn_widt_height"-->
-    <!--android:layout_alignParentStart="true"-->
-    <!--android:layout_alignParentLeft="true"-->
-    <!--android:layout_alignParentBottom="true"-->
-    <!--android:layout_marginStart="48dp"-->
-    <!--android:layout_marginLeft="48dp"-->
-    <!--android:layout_marginBottom="134dp"-->
-    <!--android:text="Bars"-->
-    <!--android:textAllCaps="false"-->
-    <!--android:textSize="18sp" />-->
+    <TextView
+        android:id="@+id/idNoInternetText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/idAppBar"
+        android:layout_marginLeft="80dp"
+        android:layout_marginTop="198dp"
+        android:gravity="center_horizontal"
+        android:padding="10dp"
+        android:text="No Internet Connection"
+        android:textColor="@color/colorBlack"
+        android:textSize="18sp"
+        android:visibility="gone" />
 </RelativeLayout>

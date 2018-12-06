@@ -14,13 +14,14 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
 /**
  * Created by Amit on 22-Nov-18.
  */
 public class MainActivity extends AppCompatActivity {
 
+    //ConnectivityReceiver connectivityReceiver;
+    //TextView lblNoInternetText;
     private GridView gridView;
     private String[] placeNames = {"Hospitals", "Hotel", "ATM", "Bars"};
     private int[] placeThumbnails = {
@@ -39,26 +40,31 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         gridView = findViewById(R.id.gridview);
+        //lblNoInternetText = (TextView) findViewById(R.id.idNoInternetText);
         toolbar.setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
         }
+//        connectivityReceiver = new ConnectivityReceiver(getApplicationContext());
+//        //check if internet available or not
+//        if (!connectivityReceiver.isConnected()) {
+//            lblNoInternetText.setVisibility(View.VISIBLE);
+//            gridView.setVisibility(View.GONE);
+//            Snackbar.make(gridView, "You need Internet to use this app.", Snackbar.LENGTH_SHORT).show();
+//        } else {
+//            lblNoInternetText.setVisibility(View.GONE);
+//        }
         MainActivityAdapter adapterViewAndroid = new MainActivityAdapter(MainActivity.this, placeNames, placeThumbnails);
         gridView.setAdapter(adapterViewAndroid);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Toast.makeText(MainActivity.this, "GridView Item: " + placeNames[+position], Toast.LENGTH_LONG).show();
                 startActivity(new Intent(getApplicationContext(), activities[position]));
             }
         });
     }
-
 
 }

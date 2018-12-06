@@ -1,9 +1,11 @@
 package android.practices.findplaces.Activity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.practices.findplaces.Adapter.HospitalListAdapter;
 import android.practices.findplaces.Constants.AppConstants;
 import android.practices.findplaces.Models.GooglePlacesResponse;
@@ -11,9 +13,11 @@ import android.practices.findplaces.Network.ApiClient;
 import android.practices.findplaces.Network.ApiInterface;
 import android.practices.findplaces.Network.GPSTracker;
 import android.practices.findplaces.R;
+import android.practices.findplaces.receivers.ConnectivityReceiver;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,6 +30,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
@@ -39,7 +44,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HospitalsActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
+public class HospitalsActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks, ConnectivityReceiver.ConnectivityReceiverListener {
 
     private static final String TAG = HospitalsActivity.class.getSimpleName();
     private static final int RC_FINE = 123;
@@ -50,6 +55,9 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
     ProgressBar progressBar;
     LinearLayout errorLayout;
     Button btnRetry;
+    TextView lblNoInternetText;
+    ConnectivityReceiver connectivityReceiver;
+    SwipeRefreshLayout mSwipeRefreshLayout;
     private String coOrdinates;
     private HospitalListAdapter hospitalListAdapter;
     private GPSTracker gpsTracker;
@@ -58,11 +66,13 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hospitals);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        recyclerView = (RecyclerView) findViewById(R.id.placeslist_recyclerview);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        errorLayout = (LinearLayout) findViewById(R.id.idErrorLayout);
-        btnRetry = (Button) findViewById(R.id.idBtnRetry);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        recyclerView = findViewById(R.id.placeslist_recyclerview);
+        progressBar = findViewById(R.id.progressBar);
+        errorLayout = findViewById(R.id.idErrorLayout);
+        btnRetry = findViewById(R.id.idBtnRetry);
+        lblNoInternetText = findViewById(R.id.idNoInternetText);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeToRefresh);
         setSupportActionBar(toolbar);
         toolbar.setTitle("nearby Hospitals");
         setSupportActionBar(toolbar);
@@ -71,29 +81,39 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
         }
-        // check if GPS enable
-        gpsTracker = new GPSTracker(this);
-        if (gpsTracker.getIsGPSTrackingEnabled() && checkLocationPermission() && hasLocationAndContactsPermissions()) {
-            currentLat = gpsTracker.getLatitude();
-            currentLong = gpsTracker.getLongitude();
-            getNearByHospitals();
-            coOrdinates = currentLat + "," + currentLong;
-            try {
-                URLEncoder.encode(coOrdinates, "utf-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
+        connectivityReceiver = new ConnectivityReceiver(getApplicationContext());
+        //check if internet available or not
+        if (!connectivityReceiver.isConnected()) {
+            lblNoInternetText.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
         } else {
-            EasyPermissions.requestPermissions(
-                    this, "Permissions needed ...",
-                    RC_FINE,
-                    LOCATION_FINE_CORSE);
+            lblNoInternetText.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+
+            // check if GPS enable
+            gpsTracker = new GPSTracker(this);
+            if (gpsTracker.getIsGPSTrackingEnabled() && checkLocationPermission() && hasLocationAndContactsPermissions()) {
+                currentLat = gpsTracker.getLatitude();
+                currentLong = gpsTracker.getLongitude();
+                coOrdinates = currentLat + "," + currentLong;
+                try {
+                    URLEncoder.encode(coOrdinates, "utf-8");
+                    getNearByHospitals();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                EasyPermissions.requestPermissions(
+                        this, "Permissions needed ...",
+                        RC_FINE,
+                        LOCATION_FINE_CORSE);
+            }
         }
 
         LinearLayoutManager llm = new LinearLayoutManager(HospitalsActivity.this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
 
         btnRetry.setOnClickListener(new View.OnClickListener() {
@@ -104,6 +124,27 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
                 getNearByHospitals();
             }
         });
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getNearByHospitals();
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        });
+        recyclerView.addOnItemTouchListener(new HospitalListAdapter.RecyclerTouchListener(getApplicationContext(), recyclerView, new HospitalListAdapter.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                Intent mapIntent = new Intent(HospitalsActivity.this, MyActivity.class);
+                //mapIntent.putExtra("mapsData", (Parcelable) gpsTracker);
+                 startActivity(mapIntent);
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
     }
 
     public boolean checkLocationPermission() {
@@ -129,7 +170,7 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
         call.enqueue(new Callback<GooglePlacesResponse.Root>() {
             @Override
             public void onResponse(@NonNull Call<GooglePlacesResponse.Root> call, @NonNull Response<GooglePlacesResponse.Root> response) {
-                GooglePlacesResponse.Root root = (GooglePlacesResponse.Root) response.body();
+                GooglePlacesResponse.Root root = response.body();
                 Log.d(TAG, " request url: " + response.raw().request().url());
                 if (response.isSuccessful()) {
                     Log.d(TAG, " response: " + response.body());
@@ -139,8 +180,8 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
                         ArrayList<GooglePlacesResponse.CustomA> results = root.customA;
                         for (int i = 0; i < results.size(); i++) {
                             hospitalListAdapter = new HospitalListAdapter(results, getApplicationContext());
-                            recyclerView.setAdapter(hospitalListAdapter);
                         }
+                        recyclerView.setAdapter(hospitalListAdapter);
                     } else {
                         progressBar.setVisibility(View.GONE);
                         errorLayout.setVisibility(View.VISIBLE);
@@ -151,13 +192,12 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
                     errorLayout.setVisibility(View.VISIBLE);
                     Toast.makeText(getApplicationContext(), "Error code: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
-
-
             }
 
             @Override
             public void onFailure(@NonNull Call call, @NonNull Throwable t) {
                 // Log error here since request failed
+                errorLayout.setVisibility(View.VISIBLE);
                 call.cancel();
             }
         });
@@ -175,6 +215,16 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (connectivityReceiver.isConnected()) {
+            lblNoInternetText.setVisibility(View.GONE);
+        } else {
+            lblNoInternetText.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
         Log.d(TAG, "onPermissionsGranted for Location:" + requestCode + ":" + perms.size());
     }
@@ -184,6 +234,18 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
         Log.d(TAG, "onPermissionsDenied:" + requestCode + ":" + perms.size());
         if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
             new AppSettingsDialog.Builder(this).build().show();
+        }
+    }
+
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        if (isConnected) {
+            lblNoInternetText.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+            mSwipeRefreshLayout.setRefreshing(true);
+        } else {
+            lblNoInternetText.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
         }
     }
 }

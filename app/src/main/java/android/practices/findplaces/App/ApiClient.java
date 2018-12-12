@@ -1,4 +1,4 @@
-package android.practices.findplaces.Network;
+package android.practices.findplaces.App;
 
 import android.practices.findplaces.Constants.AppConstants;
 
@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class ApiClient {
 
-    private static final String BASE_URL = AppConstants.BASE_URL;
+    private static final String BASE_URL = AppConstants.GOOGLE_PLACES_URL;
     private static Retrofit retrofit = null;
 
     public static Retrofit getClient() {

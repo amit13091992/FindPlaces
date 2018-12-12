@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="5dp">
+    android:padding="10dp"
+    android:weightSum="3">
 
     <TextView
         android:id="@+id/idName"
@@ -29,41 +30,11 @@
         android:text="Rating"
         android:textSize="16sp" />
 
-
     <TextView
-        android:visibility="gone"
-        android:id="@+id/idPhone"
+        android:id="@+id/idLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="Phone"
+        android:text="Location"
         android:textSize="16sp" />
-
-    <TextView android:visibility="gone"
-        android:id="@+id/idDistance"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:text="Distance"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/idCurrentLocation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:visibility="gone"
-        android:text="Current Location"
-        android:textSize="16sp" />
-
-    <ImageView
-        android:id="@+id/idImage"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:padding="5dp"
-        android:text="Place Image"
-        android:textSize="16sp"
-        android:visibility="gone" />
-
-
 </LinearLayout>

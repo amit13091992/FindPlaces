@@ -12,9 +12,10 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
@@ -25,11 +26,14 @@ import java.util.ArrayList;
 
 public class HospitalListAdapter extends RecyclerView.Adapter<HospitalListAdapter.MyViewHolder> {
     Context context;
+    ArrayList<LatLng> latLngArrayList;
     private ArrayList<GooglePlacesResponse.CustomA> stLstStores;
 
-    public HospitalListAdapter(ArrayList<GooglePlacesResponse.CustomA> stLstStores, Context context) {
-        this.stLstStores = stLstStores;
+
+    public HospitalListAdapter(Context context, ArrayList<LatLng> latLng, ArrayList<GooglePlacesResponse.CustomA> stLstStores) {
         this.context = context;
+        this.latLngArrayList = latLng;
+        this.stLstStores = stLstStores;
     }
 
     @NonNull
@@ -48,36 +52,14 @@ public class HospitalListAdapter extends RecyclerView.Adapter<HospitalListAdapte
         holder.res_name.setText("Place: " + stLstStores.get(holder.getAdapterPosition()).name);
         holder.res_address.setText("Address: " + stLstStores.get(holder.getAdapterPosition()).vicinity);
         holder.res_rating.setText("Rating: " + stLstStores.get(holder.getAdapterPosition()).rating);
-        Log.i("photos array: ", stLstStores.get(holder.getAdapterPosition()).photos + "");
+        holder.res_rating.setText("Location: " + stLstStores.get(holder.getAdapterPosition()).geometry);
+        holder.view1.setTag(context);
     }
 
     @Override
     public int getItemCount() {
         return stLstStores.size();
 
-    }
-
-
-    public class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView res_name;
-        TextView res_address;
-        TextView res_rating;
-        TextView res_phone;
-        TextView res_distance;
-        TextView current_location;
-        ImageView res_image;
-        //int view_type;
-
-        public MyViewHolder(View view, int viewType) {
-            super(view);
-            this.res_name = (TextView) itemView.findViewById(R.id.idName);
-            this.res_rating = (TextView) itemView.findViewById(R.id.idRating);
-            this.res_address = (TextView) itemView.findViewById(R.id.idAddress);
-            this.res_phone = (TextView) itemView.findViewById(R.id.idPhone);
-            this.res_distance = (TextView) itemView.findViewById(R.id.idDistance);
-            this.res_image = (ImageView) itemView.findViewById(R.id.idImage);
-
-        }
     }
 
     public interface ClickListener {
@@ -126,5 +108,24 @@ public class HospitalListAdapter extends RecyclerView.Adapter<HospitalListAdapte
 
         }
     }
+
+    public class MyViewHolder extends RecyclerView.ViewHolder {
+        public GoogleMap map;
+        TextView res_name;
+        TextView res_address;
+        TextView res_rating;
+        TextView res_location;
+        View view1;
+
+        public MyViewHolder(View view, int viewType) {
+            super(view);
+            view1 = view;
+            this.res_name = (TextView) itemView.findViewById(R.id.idName);
+            this.res_rating = (TextView) itemView.findViewById(R.id.idRating);
+            this.res_address = (TextView) itemView.findViewById(R.id.idAddress);
+            this.res_location = (TextView) itemView.findViewById(R.id.idLocation);
+        }
+    }
+
 }
 

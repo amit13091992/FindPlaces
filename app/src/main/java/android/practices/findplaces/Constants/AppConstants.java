@@ -5,29 +5,12 @@ package android.practices.findplaces.Constants;
  */
 public class AppConstants {
 
-    /*
-    https://maps.googleapis.com/maps/api/place/nearbysearch/
-    json?location=17.4425265,78.4467634
-    &radius=1500
-    &type=restaurant
-    &keyword=cruise
-    &key=AIzaSyBcrguYwN2lx2ozFMmbrcrJoK_BrdOS5jo
-     */
-
-    /*
-   https://maps.googleapis.com/maps/api/place/nearbysearch/json?
-   &location=17.43922652%2C78.44895586
-   &radius=5000
-   &types=Hospitals
-   &keyword=Hospitals
-   &key=AIzaSyBcrguYwN2lx2ozFMmbrcrJoK_BrdOS5jo
-     */
-
     public static final String API_KEY = "AIzaSyBcrguYwN2lx2ozFMmbrcrJoK_BrdOS5jo";
 
     public static final String TAG = "gplaces";
 
-    public static final String BASE_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/";
+    public static final String GOOGLE_PLACES_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/";
+    public static final String GOOGLE_DIRECTIONS_URL = "https://maps.googleapis.com/maps/api/directions/json?origin=";
 
     public static final String RESULTS = "results";
     public static final String STATUS = "status";
@@ -59,6 +42,8 @@ public class AppConstants {
     public static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
     // The minimum time between updates in milliseconds
     public static final long MIN_TIME_BW_UPDATES = 1000 * 60; // 1 minute
+    // Timeout limit for making call for direction API.
+    public static final int MIN_TIMEOUT_LIMIT = 5000; // unit in miliseconds
 
 
 }

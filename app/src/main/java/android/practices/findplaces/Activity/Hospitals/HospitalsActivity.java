@@ -1,15 +1,13 @@
-package android.practices.findplaces.Activity;
+package android.practices.findplaces.Activity.Hospitals;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.practices.findplaces.Adapter.HospitalListAdapter;
+import android.practices.findplaces.App.ApiClient;
+import android.practices.findplaces.App.ApiInterface;
 import android.practices.findplaces.Constants.AppConstants;
 import android.practices.findplaces.Models.GooglePlacesResponse;
-import android.practices.findplaces.Network.ApiClient;
-import android.practices.findplaces.Network.ApiInterface;
 import android.practices.findplaces.Network.GPSTracker;
 import android.practices.findplaces.R;
 import android.practices.findplaces.receivers.ConnectivityReceiver;
@@ -18,7 +16,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -32,24 +30,21 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.List;
 
-import pub.devrel.easypermissions.AppSettingsDialog;
-import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HospitalsActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks, ConnectivityReceiver.ConnectivityReceiverListener {
+public class HospitalsActivity extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
 
     private static final String TAG = HospitalsActivity.class.getSimpleName();
-    private static final int RC_FINE = 123;
-    private static final String[] LOCATION_FINE_CORSE =
-            {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-    double currentLat, currentLong;
+    double placeLatitude, placeLongitude;
     RecyclerView recyclerView;
     ProgressBar progressBar;
     LinearLayout errorLayout;
@@ -57,10 +52,20 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
     TextView lblNoInternetText;
     ConnectivityReceiver connectivityReceiver;
     SwipeRefreshLayout mSwipeRefreshLayout;
-    GooglePlacesResponse.CustomA location;
+    ArrayList<GooglePlacesResponse.CustomA> results;
+    ArrayList<LatLng> latLngArrayList;
     private String coOrdinates;
     private HospitalListAdapter hospitalListAdapter;
-    private GPSTracker gpsTracker;
+    private RecyclerView.RecyclerListener mRecycleListener = new RecyclerView.RecyclerListener() {
+        @Override
+        public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
+            HospitalListAdapter.MyViewHolder mapHolder = (HospitalListAdapter.MyViewHolder) holder;
+            if (mapHolder.map != null) {
+                mapHolder.map.clear();
+                mapHolder.map.setMapType(GoogleMap.MAP_TYPE_NONE);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -82,6 +87,11 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
             window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
         }
         connectivityReceiver = new ConnectivityReceiver(getApplicationContext());
+        //recyclerview
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setRecyclerListener(mRecycleListener);
         //check if internet available or not
         if (!connectivityReceiver.isConnected()) {
             lblNoInternetText.setVisibility(View.VISIBLE);
@@ -91,10 +101,11 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
             progressBar.setVisibility(View.VISIBLE);
 
             // check if GPS enable
-            gpsTracker = new GPSTracker(this);
-            if (gpsTracker.getIsGPSTrackingEnabled() && checkLocationPermission() && hasLocationAndContactsPermissions()) {
-                currentLat = gpsTracker.getLatitude();
-                currentLong = gpsTracker.getLongitude();
+            GPSTracker gpsTracker = new GPSTracker(this);
+            if (gpsTracker.getIsGPSTrackingEnabled()) {
+
+                double currentLat = gpsTracker.getLatitude();
+                double currentLong = gpsTracker.getLongitude();
                 coOrdinates = currentLat + "," + currentLong;
                 try {
                     URLEncoder.encode(coOrdinates, "utf-8");
@@ -103,37 +114,41 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
                     e.printStackTrace();
                 }
             } else {
-                EasyPermissions.requestPermissions(
-                        this, "Permissions needed ...",
-                        RC_FINE,
-                        LOCATION_FINE_CORSE);
+                Toast.makeText(HospitalsActivity.this, "Unable to fetch current Locations, Try Again !!!", Toast.LENGTH_SHORT).show();
             }
         }
 
         btnRetry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                errorLayout.setVisibility(View.GONE);
-                progressBar.setVisibility(View.GONE);
-                getNearByHospitals();
+                if (connectivityReceiver.isConnected()) {
+                    errorLayout.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.GONE);
+                    getNearByHospitals();
+                } else {
+                    Toast.makeText(HospitalsActivity.this, "Please Turn on Internet and Try Again !!!", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                getNearByHospitals();
-                mSwipeRefreshLayout.setRefreshing(false);
+                if (connectivityReceiver.isConnected()) {
+                    getNearByHospitals();
+                    mSwipeRefreshLayout.setRefreshing(true);
+                } else {
+                    lblNoInternetText.setVisibility(View.VISIBLE);
+                    Toast.makeText(HospitalsActivity.this, "Please Turn on Internet and Try Again !!!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         recyclerView.addOnItemTouchListener(new HospitalListAdapter.RecyclerTouchListener(getApplicationContext(), recyclerView, new HospitalListAdapter.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                String latitude = location.geometry.locationA.lat;
-                String longitude = location.geometry.locationA.lng;
-                Intent mapIntent = new Intent(HospitalsActivity.this, ShowLocationOnMapActivity.class);
-                mapIntent.putExtra("latitude", latitude);
-                mapIntent.putExtra("longitude", longitude);
+                Log.i(TAG, " Place Location: " + placeLatitude + " & " + placeLongitude);
+                Intent mapIntent = new Intent(HospitalsActivity.this, ShowHospitalsOnMapsActivity.class);
                 startActivity(mapIntent);
             }
 
@@ -142,19 +157,6 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
 
             }
         }));
-    }
-
-    public boolean checkLocationPermission() {
-        String permission = "android.permission.ACCESS_FINE_LOCATION";
-        int res = this.checkCallingOrSelfPermission(permission);
-        return (res == PackageManager.PERMISSION_GRANTED);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // EasyPermissions handles the request result.
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
     private void getNearByHospitals() {
@@ -169,23 +171,25 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
             public void onResponse(@NonNull Call<GooglePlacesResponse.Root> call, @NonNull Response<GooglePlacesResponse.Root> response) {
                 GooglePlacesResponse.Root root = response.body();
                 Log.d(TAG, " request url: " + response.raw().request().url());
+                latLngArrayList = new ArrayList<>();
                 if (response.isSuccessful()) {
                     Log.d(TAG, " response: " + response.body());
                     assert root != null;
                     if (root.status.equals("OK")) {
                         progressBar.setVisibility(View.GONE);
-                        ArrayList<GooglePlacesResponse.CustomA> results = root.customA;
+                        results = root.customA;
                         for (int i = 0; i < results.size(); i++) {
-                            hospitalListAdapter = new HospitalListAdapter(results, getApplicationContext());
+                            placeLatitude = Double.parseDouble(results.get(i).geometry.locationA.lat);
+                            placeLongitude = Double.parseDouble(results.get(i).geometry.locationA.lng);
+                            latLngArrayList.add(new LatLng(placeLatitude, placeLongitude));
+                            hospitalListAdapter = new HospitalListAdapter(getApplicationContext(), latLngArrayList, results);
+                            recyclerView.setAdapter(hospitalListAdapter);
                         }
-                        LinearLayoutManager llm = new LinearLayoutManager(HospitalsActivity.this);
-                        recyclerView.setLayoutManager(llm);
-                        recyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL));
-                        recyclerView.setAdapter(hospitalListAdapter);
+
                     } else {
                         errorLayout.setVisibility(View.VISIBLE);
                         progressBar.setVisibility(View.GONE);
-                        //Toast.makeText(getApplicationContext(), "No matches found near you, Please Retry!!!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "No matches found near you, Please Retry!!!", Toast.LENGTH_SHORT).show();
                     }
                 } else if (response.code() != 200) {
                     progressBar.setVisibility(View.GONE);
@@ -197,15 +201,11 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
             @Override
             public void onFailure(@NonNull Call call, @NonNull Throwable t) {
                 // Log error here since request failed
+                progressBar.setVisibility(View.GONE);
                 errorLayout.setVisibility(View.VISIBLE);
                 call.cancel();
             }
         });
-
-    }
-
-    private boolean hasLocationAndContactsPermissions() {
-        return EasyPermissions.hasPermissions(this, LOCATION_FINE_CORSE);
     }
 
     @Override
@@ -219,21 +219,10 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
         super.onResume();
         if (connectivityReceiver.isConnected()) {
             lblNoInternetText.setVisibility(View.GONE);
+            mSwipeRefreshLayout.setRefreshing(false);
         } else {
             lblNoInternetText.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
-    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
-        Log.d(TAG, "onPermissionsGranted for Location:" + requestCode + ":" + perms.size());
-    }
-
-    @Override
-    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
-        Log.d(TAG, "onPermissionsDenied:" + requestCode + ":" + perms.size());
-        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
-            new AppSettingsDialog.Builder(this).build().show();
+            mSwipeRefreshLayout.setRefreshing(true);
         }
     }
 
@@ -242,10 +231,11 @@ public class HospitalsActivity extends AppCompatActivity implements EasyPermissi
         if (isConnected) {
             lblNoInternetText.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
-            mSwipeRefreshLayout.setRefreshing(true);
+            mSwipeRefreshLayout.setRefreshing(false);
         } else {
             lblNoInternetText.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
+            mSwipeRefreshLayout.setRefreshing(true);
         }
     }
 }

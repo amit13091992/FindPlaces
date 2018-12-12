@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * Created by Amit on 30-Nov-18.
  */
 
-public class GooglePlacesResponse {
+public class GooglePlacesResponse implements Serializable {
 
     @SerializedName("name")
     @Expose
@@ -21,13 +21,16 @@ public class GooglePlacesResponse {
     @SerializedName("rating")
     @Expose
     public String rating;
-    public String distance;
     public int phone;
-    public String currentLocation;
 
+    public static class LocationA implements Serializable {
+        @SerializedName("lat")
+        public String lat;
+        @SerializedName("lng")
+        public String lng;
+    }
 
     public class Root implements Serializable {
-
         @SerializedName("results")
         public ArrayList<CustomA> customA = new ArrayList<>();
         @SerializedName("status")
@@ -47,7 +50,6 @@ public class GooglePlacesResponse {
         public String place_id;
         @SerializedName("rating")
         public String rating;
-
     }
 
     public class Photos implements Serializable {
@@ -58,14 +60,6 @@ public class GooglePlacesResponse {
     public class Geometry implements Serializable {
         @SerializedName("location")
         public LocationA locationA;
-
-    }
-
-    public class LocationA implements Serializable {
-        @SerializedName("lat")
-        public String lat;
-        @SerializedName("lng")
-        public String lng;
     }
 
 }

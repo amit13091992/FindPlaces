@@ -11,8 +11,8 @@
 
     <ImageView
         android:id="@+id/idPlaceIcon"
-        android:layout_width="130dp"
-        android:layout_height="130dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_gravity="center"
         android:layout_margin="10dp" />
 
@@ -22,10 +22,10 @@
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif"
         android:gravity="center"
-        android:shadowColor="@color/shadow_color"
+        android:shadowColor="@color/colorAccent"
         android:text="Place Name"
         android:textAllCaps="false"
-        android:textColor="@color/text_colort"
-        android:textSize="17sp" />
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="18sp" />
 
 </LinearLayout>

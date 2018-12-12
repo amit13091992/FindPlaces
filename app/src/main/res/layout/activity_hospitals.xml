@@ -51,6 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/swipeToRefresh"
         android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="10dp"
         android:visibility="gone"
@@ -60,15 +61,17 @@
             android:id="@+id/textView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:text="Not abel to find places, Please try again !!!"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1.9"
+            android:text="Unable to find nearby hospitals. Please try again."
+            android:textColor="@color/colorPrimary"
             android:textSize="15sp" />
 
         <Button
             android:id="@+id/idBtnRetry"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="0.1"
             android:background="@android:color/transparent"
             android:text="RETRY"
             android:textColor="@color/colorAccent"
@@ -80,11 +83,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/idAppBar"
-        android:layout_marginLeft="80dp"
-        android:layout_marginTop="188dp"
-        android:gravity="center_horizontal"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="223dp"
         android:padding="10dp"
         android:text="No Internet Connection"
+        android:textColor="@color/colorPrimary"
         android:textSize="18sp"
         android:visibility="gone" />
 

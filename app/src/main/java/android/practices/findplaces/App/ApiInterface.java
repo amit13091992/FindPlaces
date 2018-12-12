@@ -1,4 +1,4 @@
-package android.practices.findplaces.Network;
+package android.practices.findplaces.App;
 
 import android.practices.findplaces.Models.GooglePlacesResponse;
 

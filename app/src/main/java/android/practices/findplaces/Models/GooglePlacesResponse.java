@@ -28,6 +28,14 @@ public class GooglePlacesResponse implements Serializable {
         public String lat;
         @SerializedName("lng")
         public String lng;
+
+        public String getLat() {
+            return lat;
+        }
+
+        public String getLng() {
+            return lng;
+        }
     }
 
     public class Root implements Serializable {

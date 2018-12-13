@@ -7,6 +7,6 @@
     <color name="colorBlack">#000</color>
     <color name="text_colort">#102027</color>
     <color name="shadow_color">#29434e</color>
-    <color name="mainactivity_background">#e0e0e0</color>
+    <color name="mainactivity_background">#eeeeee</color>
 
 </resources>

@@ -21,9 +21,9 @@
         android:id="@+id/idErrorLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="182dp"
-        android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="10dp"
         android:visibility="gone"
@@ -48,16 +48,16 @@
             android:background="@android:color/transparent"
             android:text="RETRY"
             android:textColor="@color/colorPrimary"
-            android:textSize="16sp" />
+            android:textSize="17sp" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/idAppIconHolder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="178dp"
-        android:gravity="center_horizontal"
         android:orientation="vertical"
         android:visibility="visible">
 
@@ -75,6 +75,7 @@
             android:id="@+id/idAppLogo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             app:srcCompat="@drawable/ic_app_icon"
             tools:ignore="ContentDescription" />
     </LinearLayout>

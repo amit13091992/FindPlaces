@@ -88,7 +88,7 @@ public class SplashScreen extends AppCompatActivity implements EasyPermissions.P
                         }
                     }, 3000);
                 } else {
-                    Toast.makeText(SplashScreen.this, "Please Turn On the Internet.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SplashScreen.this, getString(R.string.msg_turnon_internet), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -123,7 +123,7 @@ public class SplashScreen extends AppCompatActivity implements EasyPermissions.P
             // Already have permission, do the thing
         } else {
             // Do not have permissions, request them now
-            EasyPermissions.requestPermissions(this, "Permission required ...",
+            EasyPermissions.requestPermissions(this, getString(R.string.msg_permission_required),
                     RC_FINE, LOCATION_FINE_CORSE);
         }
     }

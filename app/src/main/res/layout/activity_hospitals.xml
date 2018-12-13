@@ -22,19 +22,11 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipeToRefresh"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/placeslist_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/idAppBar"
-        android:padding="10dp">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/placeslist_recyclerview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-    </android.support.v4.widget.SwipeRefreshLayout>
+        android:layout_below="@+id/idAppBar" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -49,9 +41,7 @@
         android:id="@+id/idErrorLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/swipeToRefresh"
-        android:layout_marginTop="10dp"
-        android:gravity="center_vertical"
+        android:layout_centerInParent="true"
         android:orientation="horizontal"
         android:padding="10dp"
         android:visibility="gone"
@@ -61,10 +51,12 @@
             android:id="@+id/textView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="start|center"
+            android:layout_marginStart="5dp"
             android:layout_marginLeft="5dp"
             android:layout_weight="1.9"
             android:text="Unable to find nearby hospitals. Please try again."
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/colorBlack"
             android:textSize="15sp" />
 
         <Button
@@ -73,23 +65,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.1"
             android:background="@android:color/transparent"
+            android:gravity="center"
             android:text="RETRY"
-            android:textColor="@color/colorAccent"
+            android:textColor="@color/colorPrimaryDark"
             android:textSize="16sp" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/idNoInternetText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/idAppBar"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="223dp"
-        android:padding="10dp"
-        android:text="No Internet Connection"
-        android:textColor="@color/colorPrimary"
-        android:textSize="18sp"
-        android:visibility="gone" />
-
 
 </RelativeLayout>

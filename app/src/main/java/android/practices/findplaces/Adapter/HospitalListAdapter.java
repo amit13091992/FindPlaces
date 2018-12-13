@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -25,8 +24,8 @@ import java.util.ArrayList;
  */
 
 public class HospitalListAdapter extends RecyclerView.Adapter<HospitalListAdapter.MyViewHolder> {
-    Context context;
-    ArrayList<LatLng> latLngArrayList;
+    private Context context;
+    private ArrayList<LatLng> latLngArrayList;
     private ArrayList<GooglePlacesResponse.CustomA> stLstStores;
 
 
@@ -42,17 +41,15 @@ public class HospitalListAdapter extends RecyclerView.Adapter<HospitalListAdapte
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.recyclerview_listitem, parent, false);
 
-        return new MyViewHolder(itemView, viewType);
+        return new MyViewHolder(itemView);
     }
 
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull final HospitalListAdapter.MyViewHolder holder, int position) {
         Log.i("adapter_position", holder.getAdapterPosition() + "");
-        holder.res_name.setText("Place: " + stLstStores.get(holder.getAdapterPosition()).name);
-        holder.res_address.setText("Address: " + stLstStores.get(holder.getAdapterPosition()).vicinity);
-        holder.res_rating.setText("Rating: " + stLstStores.get(holder.getAdapterPosition()).rating);
-        holder.res_rating.setText("Location: " + stLstStores.get(holder.getAdapterPosition()).geometry);
+        holder.res_name.setText("Place: " + stLstStores.get(position).name);
+        holder.res_address.setText("Address: " + stLstStores.get(position).vicinity);
         holder.view1.setTag(context);
     }
 
@@ -91,16 +88,16 @@ public class HospitalListAdapter extends RecyclerView.Adapter<HospitalListAdapte
         }
 
         @Override
-        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-            View child = rv.findChildViewUnder(e.getX(), e.getY());
-            if (child != null && clickListener != null && gestureDetector.onTouchEvent(e)) {
+        public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent motionEvent) {
+            View child = rv.findChildViewUnder(motionEvent.getX(), motionEvent.getY());
+            if (child != null && clickListener != null && gestureDetector.onTouchEvent(motionEvent)) {
                 clickListener.onClick(child, rv.getChildAdapterPosition(child));
             }
             return false;
         }
 
         @Override
-        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+        public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent motionEvent) {
         }
 
         @Override
@@ -109,21 +106,16 @@ public class HospitalListAdapter extends RecyclerView.Adapter<HospitalListAdapte
         }
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
-        public GoogleMap map;
+    class MyViewHolder extends RecyclerView.ViewHolder {
         TextView res_name;
         TextView res_address;
-        TextView res_rating;
-        TextView res_location;
         View view1;
 
-        public MyViewHolder(View view, int viewType) {
+        MyViewHolder(View view) {
             super(view);
-            view1 = view;
+            this.view1 = view;
             this.res_name = (TextView) itemView.findViewById(R.id.idName);
-            this.res_rating = (TextView) itemView.findViewById(R.id.idRating);
             this.res_address = (TextView) itemView.findViewById(R.id.idAddress);
-            this.res_location = (TextView) itemView.findViewById(R.id.idLocation);
         }
     }
 

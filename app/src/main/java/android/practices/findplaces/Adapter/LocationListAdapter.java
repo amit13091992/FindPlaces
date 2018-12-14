@@ -23,13 +23,13 @@ import java.util.ArrayList;
  * Created by Amit on 30-Nov-18.
  */
 
-public class HospitalListAdapter extends RecyclerView.Adapter<HospitalListAdapter.MyViewHolder> {
+public class LocationListAdapter extends RecyclerView.Adapter<LocationListAdapter.MyViewHolder> {
     private Context context;
     private ArrayList<LatLng> latLngArrayList;
     private ArrayList<GooglePlacesResponse.CustomA> stLstStores;
 
 
-    public HospitalListAdapter(Context context, ArrayList<LatLng> latLng, ArrayList<GooglePlacesResponse.CustomA> stLstStores) {
+    public LocationListAdapter(Context context, ArrayList<LatLng> latLng, ArrayList<GooglePlacesResponse.CustomA> stLstStores) {
         this.context = context;
         this.latLngArrayList = latLng;
         this.stLstStores = stLstStores;
@@ -37,7 +37,7 @@ public class HospitalListAdapter extends RecyclerView.Adapter<HospitalListAdapte
 
     @NonNull
     @Override
-    public HospitalListAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public LocationListAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.recyclerview_listitem, parent, false);
 
@@ -46,7 +46,7 @@ public class HospitalListAdapter extends RecyclerView.Adapter<HospitalListAdapte
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull final HospitalListAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final LocationListAdapter.MyViewHolder holder, int position) {
         Log.i("adapter_position", holder.getAdapterPosition() + "");
         holder.res_name.setText("Place: " + stLstStores.get(position).name);
         holder.res_address.setText("Address: " + stLstStores.get(position).vicinity);

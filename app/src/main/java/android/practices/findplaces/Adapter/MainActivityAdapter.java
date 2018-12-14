@@ -49,10 +49,10 @@ public class MainActivityAdapter extends BaseAdapter {
 
             gridViewAndroid = new View(mContext);
             gridViewAndroid = inflater.inflate(R.layout.main_activity_gridview_items, null);
-            TextView textViewAndroid = (TextView) gridViewAndroid.findViewById(R.id.idPlaceName);
-            ImageView imageViewAndroid = (ImageView) gridViewAndroid.findViewById(R.id.idPlaceIcon);
-            textViewAndroid.setText(placeNames[i]);
-            imageViewAndroid.setImageResource(placeThumbnails[i]);
+            TextView placeType = (TextView) gridViewAndroid.findViewById(R.id.idPlaceName);
+            ImageView placeIcon = (ImageView) gridViewAndroid.findViewById(R.id.idPlaceIcon);
+            placeType.setText(placeNames[i]);
+            placeIcon.setImageResource(placeThumbnails[i]);
         } else {
             gridViewAndroid = (View) convertView;
         }

@@ -14,6 +14,7 @@
     <string name="error_fetch_location">Unable to fetch current Locations, Try Again !!!</string>
     <string name="msg_turnon_internet">Please Turn on Internet and Try Again !!!</string>
     <string name="error_place_search_error">No nearBy Places found, Please Retry!!!</string>
+    <string name="error_server">Unable to fetch places from server</string>
     <string name="msg_exit_application">Please click BACK again to exit</string>
     <string name="msg_permission_required" tools:ignore="TypographyEllipsis">Permission required ...</string>
 

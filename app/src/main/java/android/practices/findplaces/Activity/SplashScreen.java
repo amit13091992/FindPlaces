@@ -111,7 +111,16 @@ public class SplashScreen extends AppCompatActivity implements EasyPermissions.P
     protected void onResume() {
         super.onResume();
         if (connectivityReceiver.isConnected()) {
+            appIconLayout.setVisibility(View.VISIBLE);
             errorLayout.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    launchMainActivity();
+                }
+            }, 3000);
         } else {
             errorLayout.setVisibility(View.VISIBLE);
         }

@@ -4,8 +4,9 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.practices.findplaces.Activity.Hospitals.HospitalsActivity;
+import android.practices.findplaces.Activity.Hospitals.LocationListActivity;
 import android.practices.findplaces.Adapter.MainActivityAdapter;
+import android.practices.findplaces.Constants.AppConstants;
 import android.practices.findplaces.R;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -24,18 +25,6 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
     boolean doubleBackToExitPressedOnce = false;
     private GridView gridView;
-    private String[] placeNames = {"Hospitals", "Hotel", "ATM", "Schools"};
-    private int[] placeThumbnails = {
-            R.drawable.ic_hospital, R.drawable.ic_hotel,
-            R.drawable.ic_atm, R.drawable.ic_school,
-            R.drawable.ic_bars};
-    private Class[] activities = {
-            HospitalsActivity.class,   // position=0
-            HotelsActivity.class,   // position=1
-            ATMsActivity.class,   // position=2
-            SchoolActivity.class, // position=3
-//            FindBarsActivity.class,   // position=4
-    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,12 +39,14 @@ public class MainActivity extends AppCompatActivity {
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
         }
-        MainActivityAdapter adapterViewAndroid = new MainActivityAdapter(MainActivity.this, placeNames, placeThumbnails);
+        MainActivityAdapter adapterViewAndroid = new MainActivityAdapter(MainActivity.this, AppConstants.placeNames, AppConstants.placeThumbnails);
         gridView.setAdapter(adapterViewAndroid);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                startActivity(new Intent(getApplicationContext(), activities[position]));
+                Intent intent = new Intent(MainActivity.this, LocationListActivity.class);
+                intent.putExtra("place_type", AppConstants.placeNames[position]);
+                startActivity(intent);
             }
         });
     }

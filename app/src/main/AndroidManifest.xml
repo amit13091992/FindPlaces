@@ -31,22 +31,11 @@
             android:name=".Activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Activity.Hospitals.HospitalsActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".Activity.HotelsActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".Activity.ATMsActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".Activity.FindBarsActivity"
+            android:name=".Activity.Hospitals.LocationListActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
 
-        <activity android:name=".Activity.SchoolActivity" />
-
-        <activity android:name=".Activity.Hospitals.ShowHospitalsOnMapsActivity" />
+        <activity android:name=".Activity.Hospitals.LocationDetailsViewActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

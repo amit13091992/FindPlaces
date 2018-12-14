@@ -1,5 +1,7 @@
 package android.practices.findplaces.Constants;
 
+import android.practices.findplaces.R;
+
 /**
  * Created by Amit on 30-Nov-18.
  */
@@ -45,5 +47,10 @@ public class AppConstants {
     // Timeout limit for making call for direction API.
     public static final int MIN_TIMEOUT_LIMIT = 5000; // unit in miliseconds
 
+    public static final String[] placeNames = {"Hospitals", "Hotel", "atm", "School", "salon"};
 
+    public static final int[] placeThumbnails = {
+            R.drawable.ic_hospital, R.drawable.ic_hotel,
+            R.drawable.ic_atm, R.drawable.ic_school,
+            R.drawable.ic_app_icon};
 }

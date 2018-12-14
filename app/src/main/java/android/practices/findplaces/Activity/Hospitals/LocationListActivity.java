@@ -3,7 +3,7 @@ package android.practices.findplaces.Activity.Hospitals;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.practices.findplaces.Adapter.HospitalListAdapter;
+import android.practices.findplaces.Adapter.LocationListAdapter;
 import android.practices.findplaces.App.ApiClient;
 import android.practices.findplaces.App.ApiInterface;
 import android.practices.findplaces.Constants.AppConstants;
@@ -16,10 +16,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -38,9 +41,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HospitalsActivity extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
+public class LocationListActivity extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
 
-    private static final String TAG = HospitalsActivity.class.getSimpleName();
+    private static final String TAG = LocationListActivity.class.getSimpleName();
     private double placeLatitude, placeLongitude;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
@@ -50,10 +53,11 @@ public class HospitalsActivity extends AppCompatActivity implements Connectivity
     private ArrayList<GooglePlacesResponse.CustomA> results;
     private ArrayList<LatLng> latLngArrayList;
     private String coOrdinates;
-    private HospitalListAdapter hospitalListAdapter;
+    private LocationListAdapter locationListAdapter;
     private ArrayList<String> placeNameArrayList;
     private ArrayList<String> placeAddressArrayList;
     private String sPlaceName, sPlaceAddress;
+    private String placeType;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,25 +68,27 @@ public class HospitalsActivity extends AppCompatActivity implements Connectivity
         progressBar = findViewById(R.id.progressBar);
         lblNetworkError = findViewById(R.id.idErrorLayout);
         btnRetry = findViewById(R.id.idBtnRetry);
+        placeType = getIntent().getStringExtra("place_type");
+
         setSupportActionBar(toolbar);
-        toolbar.setTitle("nearby Hospitals");
+        toolbar.setTitle("nearby " + placeType);
         setSupportActionBar(toolbar);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
         }
-        //recyclerview
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(mLayoutManager);
-        //set recyclerview divider
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
 
         connectivityReceiver = new ConnectivityReceiver(getApplicationContext());
         //check if internet available or not
         if (!connectivityReceiver.isConnected()) {
             lblNetworkError.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.GONE);
         } else {
             lblNetworkError.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
@@ -100,7 +106,7 @@ public class HospitalsActivity extends AppCompatActivity implements Connectivity
                     e.printStackTrace();
                 }
             } else {
-                Toast.makeText(HospitalsActivity.this, getString(R.string.error_fetch_location), Toast.LENGTH_SHORT).show();
+                Toast.makeText(LocationListActivity.this, getString(R.string.error_fetch_location), Toast.LENGTH_SHORT).show();
             }
 
             getNearByHospitals();
@@ -112,13 +118,14 @@ public class HospitalsActivity extends AppCompatActivity implements Connectivity
                 if (connectivityReceiver.isConnected()) {
                     lblNetworkError.setVisibility(View.GONE);
                     progressBar.setVisibility(View.VISIBLE);
+                    getNearByHospitals();
                 } else {
-                    Toast.makeText(HospitalsActivity.this, getString(R.string.msg_turnon_internet), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LocationListActivity.this, getString(R.string.msg_turnon_internet), Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        recyclerView.addOnItemTouchListener(new HospitalListAdapter.RecyclerTouchListener(getApplicationContext(), recyclerView, new HospitalListAdapter.ClickListener() {
+        recyclerView.addOnItemTouchListener(new LocationListAdapter.RecyclerTouchListener(getApplicationContext(), recyclerView, new LocationListAdapter.ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 if (latLngArrayList.size() != 0) {
@@ -132,9 +139,8 @@ public class HospitalsActivity extends AppCompatActivity implements Connectivity
                         sPlaceName = placeNameArrayList.get(position);
                         sPlaceAddress = placeAddressArrayList.get(position);
 
-
                         Log.i(TAG, " Place Location: " + placeLatitude + " & " + placeLongitude);
-                        Intent mapIntent = new Intent(HospitalsActivity.this, ShowHospitalsOnMapsActivity.class);
+                        Intent mapIntent = new Intent(LocationListActivity.this, LocationDetailsViewActivity.class);
                         mapIntent.putExtra("latitude", placeLatitude);
                         mapIntent.putExtra("longitude", placeLongitude);
                         mapIntent.putExtra("name", sPlaceName);
@@ -154,11 +160,14 @@ public class HospitalsActivity extends AppCompatActivity implements Connectivity
     }
 
     private void getNearByHospitals() {
+        Log.d(TAG, "Method call:---> fetching places from server");
+        Log.d(TAG, "Method call:---> place type: " + placeType);
+
         progressBar.setVisibility(View.VISIBLE);
         ApiInterface apiService =
                 ApiClient.getClient().create(ApiInterface.class);
         Call<GooglePlacesResponse.Root> call = apiService.getHospitals(
-                coOrdinates, AppConstants.PROXIMITY_RADIUS, "Hospitals", "Hospitals", AppConstants.API_KEY);
+                coOrdinates, AppConstants.PROXIMITY_RADIUS, placeType, placeType, AppConstants.API_KEY);
 
         call.enqueue(new Callback<GooglePlacesResponse.Root>() {
             @Override
@@ -176,8 +185,8 @@ public class HospitalsActivity extends AppCompatActivity implements Connectivity
                         results = root.customA;
                         if (results.size() != 0) {
                             for (int i = 0; i < results.size(); i++) {
-                                hospitalListAdapter = new HospitalListAdapter(getApplicationContext(), latLngArrayList, results);
-                                recyclerView.setAdapter(hospitalListAdapter);
+                                locationListAdapter = new LocationListAdapter(getApplicationContext(), latLngArrayList, results);
+                                recyclerView.setAdapter(locationListAdapter);
                                 placeLatitude = Double.parseDouble(results.get(i).geometry.locationA.getLat());
                                 placeLongitude = Double.parseDouble(results.get(i).geometry.locationA.getLng());
                                 latLngArrayList.add(new LatLng(placeLatitude, placeLongitude));
@@ -192,7 +201,7 @@ public class HospitalsActivity extends AppCompatActivity implements Connectivity
                     } else {
                         lblNetworkError.setVisibility(View.VISIBLE);
                         progressBar.setVisibility(View.GONE);
-                        Toast.makeText(getApplicationContext(), getString(R.string.error_place_search_error), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), getString(R.string.error_server), Toast.LENGTH_SHORT).show();
                     }
                 } else if (response.code() != 200) {
                     progressBar.setVisibility(View.GONE);
@@ -218,14 +227,32 @@ public class HospitalsActivity extends AppCompatActivity implements Connectivity
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (connectivityReceiver.isConnected()) {
-            lblNetworkError.setVisibility(View.GONE);
-        } else {
-            lblNetworkError.setVisibility(View.VISIBLE);
-        }
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //getMenuInflater().inflate(R.menu.profile_menu, menu);
+        return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        if (connectivityReceiver.isConnected()) {
+//            lblNetworkError.setVisibility(View.GONE);
+//        } else {
+//            lblNetworkError.setVisibility(View.VISIBLE);
+//            recyclerView.setVisibility(View.GONE);
+//        }
+//    }
 
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {

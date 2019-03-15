@@ -11,8 +11,8 @@ public class AppConstants {
 
     public static final String TAG = "gplaces";
 
-    public static final String GOOGLE_PLACES_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/";
-    public static final String GOOGLE_DIRECTIONS_URL = "https://maps.googleapis.com/maps/api/directions/json?origin=";
+    public static final String GOOGLE_PLACES_URL = "https://maps.googleapis.com/maps/api/place/";
+    //public static final String GOOGLE_DIRECTIONS_URL = "https://maps.googleapis.com/maps/api/directions/json?origin=";
 
     public static final String RESULTS = "results";
     public static final String STATUS = "status";

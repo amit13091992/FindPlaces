@@ -11,18 +11,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:text="Place Name"
-        android:textColor="@color/colorAccent"
-        android:textStyle="bold"
-        android:textSize="16sp" />
+        android:text="Name "
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/idAddress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:text="Address"
+        android:text="Address "
         android:textColor="@color/colorBlack"
-        android:textSize="16sp" />
+        android:textSize="15sp" />
 
 </LinearLayout>

@@ -4,8 +4,9 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.practices.findplaces.Activity.Hospitals.LocationListActivity;
+import android.practices.findplaces.Activity.Places.LocationListActivity;
 import android.practices.findplaces.Adapter.MainActivityAdapter;
+import android.practices.findplaces.App.AppController;
 import android.practices.findplaces.Constants.AppConstants;
 import android.practices.findplaces.R;
 import android.support.annotation.Nullable;
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
+            window.setStatusBarColor(ContextCompat.getColor(AppController.getInstance().getApplicationContext(), R.color.colorPrimary));
         }
         MainActivityAdapter adapterViewAndroid = new MainActivityAdapter(MainActivity.this, AppConstants.placeNames, AppConstants.placeThumbnails);
         gridView.setAdapter(adapterViewAndroid);

@@ -2,7 +2,7 @@ package android.practices.findplaces.Adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.practices.findplaces.Models.GooglePlacesResponse;
+import android.practices.findplaces.Models.PlacesResponseModel;
 import android.practices.findplaces.R;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -26,10 +26,10 @@ import java.util.ArrayList;
 public class LocationListAdapter extends RecyclerView.Adapter<LocationListAdapter.MyViewHolder> {
     private Context context;
     private ArrayList<LatLng> latLngArrayList;
-    private ArrayList<GooglePlacesResponse.CustomA> stLstStores;
+    private ArrayList<PlacesResponseModel.CustomA> stLstStores;
 
 
-    public LocationListAdapter(Context context, ArrayList<LatLng> latLng, ArrayList<GooglePlacesResponse.CustomA> stLstStores) {
+    public LocationListAdapter(Context context, ArrayList<LatLng> latLng, ArrayList<PlacesResponseModel.CustomA> stLstStores) {
         this.context = context;
         this.latLngArrayList = latLng;
         this.stLstStores = stLstStores;

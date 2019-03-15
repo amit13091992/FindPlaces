@@ -30,24 +30,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/idAppBar"
-        android:padding="10dp"
-        android:text="Category"
         android:layout_marginStart="20dp"
+        android:layout_marginLeft="20dp"
+        android:fontFamily="sans-serif"
+        android:padding="8dp"
+        android:text="Select Place type"
         android:textColor="@color/colorPrimaryDark"
-        android:textSize="18sp" />
+        android:textSize="22sp"
+        android:textStyle="bold"
+        tools:ignore="RtlHardcoded" />
 
     <GridView
         android:id="@+id/gridview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/idTextDescription"
-        android:layout_margin="20dp"
+        android:layout_margin="12dp"
         android:elevation="5dp"
-        android:gravity="center"
-        android:horizontalSpacing="12dp"
+        android:horizontalSpacing="8dp"
         android:numColumns="2"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="12dp" />
+        android:verticalSpacing="8dp" />
 
     <ProgressBar
         android:id="@+id/progressBar"

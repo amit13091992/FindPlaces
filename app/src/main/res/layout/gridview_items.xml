@@ -1,38 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/gridItem"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/gridviewitem_root_layout"
+    android:layout_width="200dp"
+    android:layout_height="200dp"
     android:layout_gravity="center"
-    android:background="@color/colorWhite"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="10dp">
+    android:layout_margin="15dp"
+    android:orientation="vertical">
 
+    <android.support.v7.widget.CardView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:duplicateParentState="true"
+        app:cardCornerRadius="5dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/idPlaceIcon"
-            android:layout_width="65dp"
-            android:layout_height="65dp"
-            android:layout_gravity="center"
-            android:layout_margin="10dp" />
-
-        <TextView
-            android:id="@+id/idPlaceName"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:gravity="center"
-            android:shadowColor="@color/colorAccent"
-            android:text="Place Name"
-            android:textAllCaps="false"
-            android:textColor="@color/colorPrimaryDark"
-            android:textSize="18sp" />
-    </LinearLayout>
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical">
 
-</android.support.design.card.MaterialCardView>
+            <ImageView
+                android:id="@+id/idPlaceIcon"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:padding="10dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_app_icon" />
+
+            <TextView
+                android:id="@+id/idPlaceName"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:text="Place"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                tools:ignore="RtlHardcoded" />
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+</LinearLayout>

@@ -9,4 +9,9 @@
     <color name="shadow_color">#29434e</color>
     <color name="mainactivity_background">#eeeeee</color>
 
+    <color name="text_holder">#4a0072</color>
+    <color name="text_value">#8e24aa</color>
+
+
+
 </resources>

@@ -18,6 +18,7 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.List;
@@ -152,7 +153,6 @@ public class GPSTracker extends Service implements LocationListener {
         if (location != null) {
             latitude = location.getLatitude();
         }
-
         return latitude;
     }
 
@@ -165,7 +165,6 @@ public class GPSTracker extends Service implements LocationListener {
         if (location != null) {
             longitude = location.getLongitude();
         }
-
         return longitude;
     }
 

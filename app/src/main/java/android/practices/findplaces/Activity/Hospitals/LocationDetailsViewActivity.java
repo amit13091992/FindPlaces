@@ -81,7 +81,7 @@ public class LocationDetailsViewActivity extends FragmentActivity implements OnM
         /**
          * Check device is connected to Internet OR not.
          */
-        connectivityReceiver = new ConnectivityReceiver(getApplicationContext());
+        connectivityReceiver = new ConnectivityReceiver(AppController.getInstance().getApplicationContext());
         //check if internet available or not
         if (!connectivityReceiver.isConnected()) {
             lblNetworkError.setVisibility(View.VISIBLE);
@@ -255,7 +255,7 @@ public class LocationDetailsViewActivity extends FragmentActivity implements OnM
                     }
                     polyLineOptions.addAll(points);
                     polyLineOptions.width(12);
-                    polyLineOptions.color(ContextCompat.getColor(getApplicationContext(), R.color.colorAccent));
+                    polyLineOptions.color(ContextCompat.getColor(AppController.getInstance().getApplicationContext(), R.color.colorAccent));
                 }
                 if (googleMap != null&&polyLineOptions!=null)
                     googleMap.addPolyline(polyLineOptions);

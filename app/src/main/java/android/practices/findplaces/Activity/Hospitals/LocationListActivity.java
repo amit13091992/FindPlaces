@@ -76,14 +76,14 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
+            window.setStatusBarColor(ContextCompat.getColor(AppController.getInstance().getApplicationContext(), R.color.colorPrimaryDark));
         }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
 
-        connectivityReceiver = new ConnectivityReceiver(getApplicationContext());
+        connectivityReceiver = new ConnectivityReceiver(AppController.getInstance().getApplicationContext());
         //check if internet available or not
         if (!connectivityReceiver.isConnected()) {
             lblNetworkError.setVisibility(View.VISIBLE);
@@ -125,7 +125,7 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
             }
         });
 
-        recyclerView.addOnItemTouchListener(new LocationListAdapter.RecyclerTouchListener(getApplicationContext(), recyclerView, new LocationListAdapter.ClickListener() {
+        recyclerView.addOnItemTouchListener(new LocationListAdapter.RecyclerTouchListener(AppController.getInstance().getApplicationContext(), recyclerView, new LocationListAdapter.ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 if (latLngArrayList.size() != 0) {
@@ -185,7 +185,7 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
                         results = root.customA;
                         if (results.size() != 0) {
                             for (int i = 0; i < results.size(); i++) {
-                                locationListAdapter = new LocationListAdapter(getApplicationContext(), latLngArrayList, results);
+                                locationListAdapter = new LocationListAdapter(AppController.getInstance().getApplicationContext(), latLngArrayList, results);
                                 recyclerView.setAdapter(locationListAdapter);
                                 placeLatitude = Double.parseDouble(results.get(i).geometry.locationA.getLat());
                                 placeLongitude = Double.parseDouble(results.get(i).geometry.locationA.getLng());
@@ -196,12 +196,12 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
                                 placeAddressArrayList.add(sPlaceAddress);
                             }
                         } else {
-                            Toast.makeText(getApplicationContext(), getString(R.string.error_place_search_error), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AppController.getInstance().getApplicationContext(), getString(R.string.error_place_search_error), Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         lblNetworkError.setVisibility(View.VISIBLE);
                         progressBar.setVisibility(View.GONE);
-                        Toast.makeText(getApplicationContext(), getString(R.string.error_server), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AppController.getInstance().getApplicationContext(), getString(R.string.error_server), Toast.LENGTH_SHORT).show();
                     }
                 } else if (response.code() != 200) {
                     progressBar.setVisibility(View.GONE);

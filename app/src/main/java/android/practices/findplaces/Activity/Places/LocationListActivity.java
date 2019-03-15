@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -58,6 +59,7 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
     private ArrayList<String> placeAddressArrayList;
     private String sPlaceName, sPlaceAddress;
     private String placeType;
+    private String placeId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -145,6 +147,12 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
                         mapIntent.putExtra("longitude", placeLongitude);
                         mapIntent.putExtra("name", sPlaceName);
                         mapIntent.putExtra("address", sPlaceAddress);
+                        mapIntent.putExtra("placeId", placeId);
+
+                        /*Bundle args = new Bundle();
+                        args.putSerializable("placeResultArray", (Serializable) results);
+                        mapIntent.putExtra("BUNDLE", args);*/
+
                         startActivity(mapIntent);
                     }
                 } else {
@@ -192,6 +200,7 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
                                 latLngArrayList.add(new LatLng(placeLatitude, placeLongitude));
                                 sPlaceName = results.get(i).name;
                                 sPlaceAddress = results.get(i).vicinity;
+                                placeId = results.get(i).place_id;
                                 placeNameArrayList.add(sPlaceName);
                                 placeAddressArrayList.add(sPlaceAddress);
                             }

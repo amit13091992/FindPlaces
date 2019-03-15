@@ -1,6 +1,7 @@
 package android.practices.findplaces.Activity.Hospitals;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -45,6 +47,7 @@ public class LocationDetailsViewActivity extends FragmentActivity implements OnM
     private static double LONGITUDE = 0.00;
     private static String PLACE_NAME;
     private static String PLACE_ADDRESS;
+    private static String PLACE_ID;
 
     private GoogleMap googleMap;
     private ConnectivityReceiver connectivityReceiver;
@@ -53,22 +56,10 @@ public class LocationDetailsViewActivity extends FragmentActivity implements OnM
     private Button btnRetry;
     private FrameLayout mapLayout;
     private String sCurrentLocation;
-    /*    private GoogleMap.OnMyLocationClickListener onMyLocationClickListener =
-                new GoogleMap.OnMyLocationClickListener() {
-                    @Override
-                    public void onMyLocationClick(@NonNull Location location) {
-                        googleMap.setMinZoomPreference(15);
-                        CircleOptions circleOptions = new CircleOptions();
-                        circleOptions.center(new LatLng(location.getLatitude(),
-                                location.getLongitude()));
-                        circleOptions.radius(200);
-                        circleOptions.fillColor(Color.RED);
-                        circleOptions.strokeWidth(6);
-                        googleMap.addCircle(circleOptions);
-                    }
-                };*/
     private LatLng currentLocation;
     private LatLng placeLocation;
+    private ProgressBar progressBar;
+    //private ArrayList<GooglePlacesResponse.CustomA> placeResultArray;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,6 +68,7 @@ public class LocationDetailsViewActivity extends FragmentActivity implements OnM
         lblNetworkError = findViewById(R.id.idErrorLayout);
         btnRetry = findViewById(R.id.idBtnRetry);
         mapLayout = findViewById(R.id.mapLayout);
+        progressBar = findViewById(R.id.progressBar);
 
         /**
          * Check device is connected to Internet OR not.
@@ -100,6 +92,12 @@ public class LocationDetailsViewActivity extends FragmentActivity implements OnM
         LONGITUDE = getIntent().getDoubleExtra("longitude", 0.00);
         PLACE_NAME = getIntent().getStringExtra("name");
         PLACE_ADDRESS = getIntent().getStringExtra("address");
+        PLACE_ID = getIntent().getStringExtra("placeId");
+       /* //get the bundle
+        Bundle args = getIntent().getBundleExtra("BUNDLE");
+        //noinspection unchecked
+        placeResultArray = (ArrayList<GooglePlacesResponse.CustomA>) args.getSerializable("placeResultArray");
+        args.size();*/
 
         btnRetry.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,6 +114,7 @@ public class LocationDetailsViewActivity extends FragmentActivity implements OnM
             }
         });
     }
+
 
     private void loadMapIntoFragment() {
         supportMapFragment = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapfragment));
@@ -169,19 +168,57 @@ public class LocationDetailsViewActivity extends FragmentActivity implements OnM
                 googleMap.setMinZoomPreference(10);
                 googleMap.getMaxZoomLevel();
                 fetchCurrentLocation();
+
+                getPlaceDetails();
                 /*googleMap.addPolyline(new PolylineOptions()
                         .add(placeLocation, currentLocation)
                         .width(10)
                         .color(R.color.colorAccent));*/
-                String url = getMapsApiDirectionsUrl();
+                /*String url = getMapsApiDirectionsUrl();
                 ReadTask downloadTask = new ReadTask();
-                downloadTask.execute(url);
-
+                downloadTask.execute(url);*/
                 return false;
             }
         });
     }
 
+    private void getPlaceDetails() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (connectivityReceiver.isConnected()) {
+            mapLayout.setVisibility(View.VISIBLE);
+            lblNetworkError.setVisibility(View.GONE);
+            loadMapIntoFragment();
+        } else {
+            lblNetworkError.setVisibility(View.VISIBLE);
+            mapLayout.setVisibility(View.GONE);
+            Toast.makeText(LocationDetailsViewActivity.this, getString(R.string.msg_turnon_internet), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        if (isConnected) {
+            lblNetworkError.setVisibility(View.GONE);
+        } else {
+            lblNetworkError.setVisibility(View.VISIBLE);
+        }
+    }
 
     private String getMapsApiDirectionsUrl() {
         String str_origin = "origin=" + currentLocation.latitude + "," + currentLocation.longitude;
@@ -197,7 +234,7 @@ public class LocationDetailsViewActivity extends FragmentActivity implements OnM
         return "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
     }
 
-
+    @SuppressLint("StaticFieldLeak")
     private class ReadTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... url) {
@@ -218,6 +255,7 @@ public class LocationDetailsViewActivity extends FragmentActivity implements OnM
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     private class ParserTask extends
             AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
@@ -257,43 +295,9 @@ public class LocationDetailsViewActivity extends FragmentActivity implements OnM
                     polyLineOptions.width(12);
                     polyLineOptions.color(ContextCompat.getColor(AppController.getInstance().getApplicationContext(), R.color.colorAccent));
                 }
-                if (googleMap != null&&polyLineOptions!=null)
+                if (googleMap != null && polyLineOptions != null)
                     googleMap.addPolyline(polyLineOptions);
             }
-        }
-    }
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (connectivityReceiver.isConnected()) {
-            mapLayout.setVisibility(View.VISIBLE);
-            lblNetworkError.setVisibility(View.GONE);
-            loadMapIntoFragment();
-        } else {
-            lblNetworkError.setVisibility(View.VISIBLE);
-            mapLayout.setVisibility(View.GONE);
-            Toast.makeText(LocationDetailsViewActivity.this, getString(R.string.msg_turnon_internet), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onNetworkConnectionChanged(boolean isConnected) {
-        if (isConnected) {
-            lblNetworkError.setVisibility(View.GONE);
-        } else {
-            lblNetworkError.setVisibility(View.VISIBLE);
         }
     }
 }

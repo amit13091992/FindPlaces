@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * Created by Amit on 30-Nov-18.
  */
 
-public class GooglePlacesResponse implements Serializable {
+public class PlacesResponseModel implements Serializable {
 
     @SerializedName("name")
     @Expose
@@ -21,7 +21,6 @@ public class GooglePlacesResponse implements Serializable {
     @SerializedName("rating")
     @Expose
     public String rating;
-    public int phone;
 
     public static class LocationA implements Serializable {
         @SerializedName("lat")

@@ -18,4 +18,9 @@
     <string name="msg_exit_application">Please click BACK again to exit</string>
     <string name="msg_permission_required" tools:ignore="TypographyEllipsis">Permission required ...</string>
 
+    <string name="gps.lable.gps" tools:ignore="ExtraTranslation">Warning</string>
+    <string name="gps.lable.warning_message" tools:ignore="ExtraTranslation">You need to start GPS to display Route on Map. Would you like to Enable it?</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+
 </resources>

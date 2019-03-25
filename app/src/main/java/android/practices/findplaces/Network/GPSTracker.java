@@ -1,6 +1,7 @@
 package android.practices.findplaces.Network;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Service;
@@ -26,6 +27,7 @@ import java.util.Locale;
 /**
  * Created by Amit on 30-Nov-18.
  */
+@SuppressLint("Registered")
 public class GPSTracker extends Service implements LocationListener {
 
     // The minimum distance to change updates in meters
@@ -34,7 +36,7 @@ public class GPSTracker extends Service implements LocationListener {
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
     // Get Class Name
     private static String TAG = GPSTracker.class.getName();
-    private final Context mContext;
+    private Context mContext;
     // Declaring a Location Manager
     protected LocationManager locationManager;
     // flag for GPS Status
@@ -51,6 +53,9 @@ public class GPSTracker extends Service implements LocationListener {
     // Store LocationManager.GPS_PROVIDER or LocationManager.NETWORK_PROVIDER information
     private String provider_info;
 
+    //default constructor
+    public GPSTracker() {
+    }
 
     public GPSTracker(Context context) {
         this.mContext = context;
@@ -152,7 +157,6 @@ public class GPSTracker extends Service implements LocationListener {
         if (location != null) {
             latitude = location.getLatitude();
         }
-
         return latitude;
     }
 
@@ -165,7 +169,6 @@ public class GPSTracker extends Service implements LocationListener {
         if (location != null) {
             longitude = location.getLongitude();
         }
-
         return longitude;
     }
 

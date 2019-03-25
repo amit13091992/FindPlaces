@@ -1,4 +1,4 @@
-package android.practices.findplaces.Activity.Hospitals;
+package android.practices.findplaces.Activity.Places;
 
 import android.content.Intent;
 import android.os.Build;
@@ -6,8 +6,9 @@ import android.os.Bundle;
 import android.practices.findplaces.Adapter.LocationListAdapter;
 import android.practices.findplaces.App.ApiClient;
 import android.practices.findplaces.App.ApiInterface;
+import android.practices.findplaces.App.AppController;
 import android.practices.findplaces.Constants.AppConstants;
-import android.practices.findplaces.Models.GooglePlacesResponse;
+import android.practices.findplaces.Models.PlacesResponseModel;
 import android.practices.findplaces.Network.GPSTracker;
 import android.practices.findplaces.R;
 import android.practices.findplaces.receivers.ConnectivityReceiver;
@@ -33,7 +34,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -45,13 +45,13 @@ import retrofit2.Response;
 public class LocationListActivity extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
 
     private static final String TAG = LocationListActivity.class.getSimpleName();
-    private double placeLatitude, placeLongitude;
+    private double placeLatitude, placeLongitude, curLat, curLong;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private LinearLayout lblNetworkError;
     private Button btnRetry;
     private ConnectivityReceiver connectivityReceiver;
-    private ArrayList<GooglePlacesResponse.CustomA> results;
+    private ArrayList<PlacesResponseModel.CustomA> results;
     private ArrayList<LatLng> latLngArrayList;
     private String coOrdinates;
     private LocationListAdapter locationListAdapter;
@@ -60,21 +60,26 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
     private String sPlaceName, sPlaceAddress;
     private String placeType;
     private String placeId;
+    private String radius;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_hospitals);
+        setContentView(R.layout.activity_places);
         Toolbar toolbar = findViewById(R.id.toolbar);
         recyclerView = findViewById(R.id.placeslist_recyclerview);
         progressBar = findViewById(R.id.progressBar);
         lblNetworkError = findViewById(R.id.idErrorLayout);
         btnRetry = findViewById(R.id.idBtnRetry);
         placeType = getIntent().getStringExtra("place_type");
+        radius = getIntent().getStringExtra("radius");
 
-        setSupportActionBar(toolbar);
         toolbar.setTitle("nearby " + placeType);
         setSupportActionBar(toolbar);
+        //this line shows back button
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -93,15 +98,14 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
             recyclerView.setVisibility(View.GONE);
         } else {
             lblNetworkError.setVisibility(View.GONE);
-            progressBar.setVisibility(View.VISIBLE);
 
             // check if GPS enable
             GPSTracker gpsTracker = new GPSTracker(this);
             if (gpsTracker.getIsGPSTrackingEnabled()) {
 
-                double currentLat = gpsTracker.getLatitude();
-                double currentLong = gpsTracker.getLongitude();
-                coOrdinates = currentLat + "," + currentLong;
+                curLat = gpsTracker.getLatitude();
+                curLong = gpsTracker.getLongitude();
+                coOrdinates = curLat + "," + curLong;
                 try {
                     URLEncoder.encode(coOrdinates, "utf-8");
                 } catch (UnsupportedEncodingException e) {
@@ -111,7 +115,11 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
                 Toast.makeText(LocationListActivity.this, getString(R.string.error_fetch_location), Toast.LENGTH_SHORT).show();
             }
 
-            getNearByHospitals();
+            Log.i(TAG, " radius value: " + radius);
+            radius = radius.substring(4, 5);
+            Log.d(TAG, " > radius for api: " + radius);
+
+            getNearByPlacesList();
         }
 
         btnRetry.setOnClickListener(new View.OnClickListener() {
@@ -120,7 +128,7 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
                 if (connectivityReceiver.isConnected()) {
                     lblNetworkError.setVisibility(View.GONE);
                     progressBar.setVisibility(View.VISIBLE);
-                    getNearByHospitals();
+                    getNearByPlacesList();
                 } else {
                     Toast.makeText(LocationListActivity.this, getString(R.string.msg_turnon_internet), Toast.LENGTH_SHORT).show();
                 }
@@ -142,12 +150,14 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
                         sPlaceAddress = placeAddressArrayList.get(position);
 
                         Log.i(TAG, " Place Location: " + placeLatitude + " & " + placeLongitude);
-                        Intent mapIntent = new Intent(LocationListActivity.this, LocationDetailsViewActivity.class);
+                        Intent mapIntent = new Intent(LocationListActivity.this, LocationMapViewActivity.class);
                         mapIntent.putExtra("latitude", placeLatitude);
                         mapIntent.putExtra("longitude", placeLongitude);
                         mapIntent.putExtra("name", sPlaceName);
                         mapIntent.putExtra("address", sPlaceAddress);
                         mapIntent.putExtra("placeId", placeId);
+                        mapIntent.putExtra("curLat", curLat);
+                        mapIntent.putExtra("curLong", curLong);
 
                         /*Bundle args = new Bundle();
                         args.putSerializable("placeResultArray", (Serializable) results);
@@ -167,20 +177,37 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
         }));
     }
 
-    private void getNearByHospitals() {
+    private void getNearByPlacesList() {
         Log.d(TAG, "Method call:---> fetching places from server");
         Log.d(TAG, "Method call:---> place type: " + placeType);
 
         progressBar.setVisibility(View.VISIBLE);
+
         ApiInterface apiService =
                 ApiClient.getClient().create(ApiInterface.class);
-        Call<GooglePlacesResponse.Root> call = apiService.getHospitals(
-                coOrdinates, AppConstants.PROXIMITY_RADIUS, placeType, placeType, AppConstants.API_KEY);
+        Call<PlacesResponseModel.Root> call;
+        if (placeType.equalsIgnoreCase("ATM")) {
+            call = apiService.getPlaces(
+                    coOrdinates, Integer.parseInt(radius), "atm", "atm", AppConstants.API_KEY);
+        } else if (placeType.equalsIgnoreCase("School")) {
+            call = apiService.getPlaces(
+                    coOrdinates, Integer.parseInt(radius), "School", "School", AppConstants.API_KEY);
+        } else if (placeType.equalsIgnoreCase("Salon")) {
+            call = apiService.getPlaces(
+                    coOrdinates, Integer.parseInt(radius), "salon", "salon", AppConstants.API_KEY);
+        } else if (placeType.equalsIgnoreCase("Gas Station")) {
+            call = apiService.getPlaces(
+                    coOrdinates, Integer.parseInt(radius), "gas_station", "gas_station", AppConstants.API_KEY);
+        } else {
+            call = apiService.getPlaces(
+                    coOrdinates, Integer.parseInt(radius), placeType, placeType, AppConstants.API_KEY);
+        }
+        Log.e(TAG, "place type: " + placeType);
 
-        call.enqueue(new Callback<GooglePlacesResponse.Root>() {
+        call.enqueue(new Callback<PlacesResponseModel.Root>() {
             @Override
-            public void onResponse(@NonNull Call<GooglePlacesResponse.Root> call, @NonNull Response<GooglePlacesResponse.Root> response) {
-                GooglePlacesResponse.Root root = response.body();
+            public void onResponse(@NonNull Call<PlacesResponseModel.Root> call, @NonNull Response<PlacesResponseModel.Root> response) {
+                PlacesResponseModel.Root root = response.body();
                 Log.d(TAG, " request url: " + response.raw().request().url());
                 latLngArrayList = new ArrayList<>();
                 placeNameArrayList = new ArrayList<>();
@@ -188,7 +215,7 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
                 if (response.isSuccessful()) {
                     Log.d(TAG, " response: " + response.body());
                     assert root != null;
-                    if (root.status.equals("OK")) {
+                    if (root.status.equals(AppConstants.OK)) {
                         progressBar.setVisibility(View.GONE);
                         results = root.customA;
                         if (results.size() != 0) {
@@ -251,17 +278,6 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
         }
         return super.onOptionsItemSelected(item);
     }
-
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        if (connectivityReceiver.isConnected()) {
-//            lblNetworkError.setVisibility(View.GONE);
-//        } else {
-//            lblNetworkError.setVisibility(View.VISIBLE);
-//            recyclerView.setVisibility(View.GONE);
-//        }
-//    }
 
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {

@@ -7,12 +7,15 @@ import android.practices.findplaces.R;
  */
 public class AppConstants {
 
-    public static final String API_KEY = "AIzaSyBcrguYwN2lx2ozFMmbrcrJoK_BrdOS5jo";
+    /**
+     * Place your API_KEY here ...
+     */
+    public static final String API_KEY = "";
 
     public static final String TAG = "gplaces";
 
-    public static final String GOOGLE_PLACES_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/";
-    public static final String GOOGLE_DIRECTIONS_URL = "https://maps.googleapis.com/maps/api/directions/json?origin=";
+    public static final String GOOGLE_PLACES_URL = "https://maps.googleapis.com/maps/api/place/";
+    //public static final String GOOGLE_DIRECTIONS_URL = "https://maps.googleapis.com/maps/api/directions/json?origin=";
 
     public static final String RESULTS = "results";
     public static final String STATUS = "status";
@@ -47,10 +50,10 @@ public class AppConstants {
     // Timeout limit for making call for direction API.
     public static final int MIN_TIMEOUT_LIMIT = 5000; // unit in miliseconds
 
-    public static final String[] placeNames = {"Hospitals", "Hotel", "atm", "School", "salon"};
+    public static final String[] placeNames = {"Hospitals", "Hotel", "ATM", "School", "Salon", "Gas Station"};
 
     public static final int[] placeThumbnails = {
             R.drawable.ic_hospital, R.drawable.ic_hotel,
             R.drawable.ic_atm, R.drawable.ic_school,
-            R.drawable.ic_app_icon};
+            R.drawable.ic_salon, R.drawable.ic_gas_station};
 }

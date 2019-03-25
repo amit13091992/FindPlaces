@@ -1,16 +1,21 @@
 package android.practices.findplaces.Activity;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.practices.findplaces.App.AppController;
 import android.practices.findplaces.R;
 import android.practices.findplaces.receivers.ConnectivityReceiver;
+import android.practices.findplaces.receivers.GPSConnectionReceiver;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ContextThemeWrapper;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -26,11 +31,12 @@ import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class SplashScreen extends AppCompatActivity implements EasyPermissions.PermissionCallbacks, ConnectivityReceiver.ConnectivityReceiverListener {
+@SuppressWarnings("deprecation")
+public class SplashScreen extends AppCompatActivity implements EasyPermissions.PermissionCallbacks, ConnectivityReceiver.ConnectivityReceiverListener, GPSConnectionReceiver.GPSConnectivityReceiverListener {
 
     private static final String TAG = SplashScreen.class.getSimpleName();
     private static final int RC_FINE = 123;
-    private static final String[] LOCATION_FINE_CORSE =
+    private static final String[] PERMISSION_REQUIRED =
             {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     LinearLayout appIconLayout;
     private ProgressBar progressBar;
@@ -55,6 +61,8 @@ public class SplashScreen extends AppCompatActivity implements EasyPermissions.P
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimary));
         }
+        AppController.getInstance().setConnectivityListener(this);
+        AppController.getInstance().setGpsConnectivityListener(this);
         connectivityReceiver = new ConnectivityReceiver(this);
         //check if internet available or not
         if (!connectivityReceiver.isConnected()) {
@@ -65,14 +73,16 @@ public class SplashScreen extends AppCompatActivity implements EasyPermissions.P
             requiresTwoPermission();
         } else {
             progressBar.setVisibility(View.VISIBLE);
+            Log.e(TAG, " getting here after permission");
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     launchMainActivity();
                 }
-            }, 3000);
+            }, 2000);
         }
+
         btnRetry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,22 +90,48 @@ public class SplashScreen extends AppCompatActivity implements EasyPermissions.P
                     appIconLayout.setVisibility(View.VISIBLE);
                     errorLayout.setVisibility(View.GONE);
                     progressBar.setVisibility(View.VISIBLE);
+                    Log.e(TAG, " getting here retry button permission");
                     final Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             launchMainActivity();
                         }
-                    }, 3000);
+                    }, 2000);
                 } else {
                     Toast.makeText(SplashScreen.this, getString(R.string.msg_turnon_internet), Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
+//        if (!GPSConnectionReceiver.isGPSTurnOn(AppController.getInstance().getApplicationContext())) {
+//            showGPSDialog();
+//        }
+    }
+
+    private void showGPSDialog() {
+        new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme)) // Theme
+                .setTitle(R.string.gps_lable_gps) // setTitle
+                .setMessage(R.string.gps_lable_warning_message) // setMessage
+                .setInverseBackgroundForced(false).setCancelable(true) //
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(final DialogInterface dialog, final int which) {
+                        dialog.cancel();
+                        startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
+
+                    }
+                }).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, final int which) {
+                dialog.cancel();
+                finish();
+            }
+        }).setIcon(R.drawable.ic_map_pin).show();
     }
 
     private void launchMainActivity() {
-        Intent intent = new Intent(SplashScreen.this, MainActivity.class);
+        Intent intent = new Intent(AppController.getInstance().getApplicationContext(), MainActivity.class);
         startActivity(intent);
         finish();
     }
@@ -110,30 +146,37 @@ public class SplashScreen extends AppCompatActivity implements EasyPermissions.P
     @Override
     protected void onResume() {
         super.onResume();
-        if (connectivityReceiver.isConnected()) {
-            appIconLayout.setVisibility(View.VISIBLE);
-            errorLayout.setVisibility(View.GONE);
+        if (!connectivityReceiver.isConnected()) {
+            errorLayout.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+            appIconLayout.setVisibility(View.GONE);
+        } else if (!hasLocationAndContactsPermissions() && !checkLocationPermission()) {
+            requiresTwoPermission();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @AfterPermissionGranted(RC_FINE)
+    private void requiresTwoPermission() {
+        if (EasyPermissions.hasPermissions(this, PERMISSION_REQUIRED)) {
+            // Already have permission, do the thing
             progressBar.setVisibility(View.VISIBLE);
+            Log.e(TAG, " getting here after permission requiresTwoPermission()");
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     launchMainActivity();
                 }
-            }, 3000);
-        } else {
-            errorLayout.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @AfterPermissionGranted(RC_FINE)
-    private void requiresTwoPermission() {
-        if (EasyPermissions.hasPermissions(this, LOCATION_FINE_CORSE)) {
-            // Already have permission, do the thing
+            }, 2000);
         } else {
             // Do not have permissions, request them now
             EasyPermissions.requestPermissions(this, getString(R.string.msg_permission_required),
-                    RC_FINE, LOCATION_FINE_CORSE);
+                    RC_FINE, PERMISSION_REQUIRED);
         }
     }
 
@@ -157,7 +200,7 @@ public class SplashScreen extends AppCompatActivity implements EasyPermissions.P
     }
 
     private boolean hasLocationAndContactsPermissions() {
-        return EasyPermissions.hasPermissions(this, LOCATION_FINE_CORSE);
+        return EasyPermissions.hasPermissions(this, PERMISSION_REQUIRED);
     }
 
     @Override
@@ -168,6 +211,13 @@ public class SplashScreen extends AppCompatActivity implements EasyPermissions.P
         } else {
             errorLayout.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onGpsStatusChanged(boolean isConnected) {
+        if (!isConnected) {
+            showGPSDialog();
         }
     }
 }

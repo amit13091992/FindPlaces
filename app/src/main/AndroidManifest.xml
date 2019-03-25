@@ -23,18 +23,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".Activity.HospitalsActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".Activity.HotelsActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".Activity.ATMsActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".Activity.FindBarsActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -43,9 +31,12 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".Activity.ShowLocationOnMapActivity" />
+        <activity
+            android:name=".Activity.Places.LocationMapViewActivity"
+            tools:ignore="InnerclassSeparator" />
 
-        <activity android:name=".Activity.MyActivity"></activity>
+        <service android:name=".Network.GPSTracker" />
+
     </application>
 
 </manifest>

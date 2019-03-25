@@ -44,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
         //lblNoInternetText = (TextView) findViewById(R.id.idNoInternetText);
         toolbar.setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -58,14 +61,12 @@ public class MainActivity extends AppCompatActivity {
 //        } else {
 //            lblNoInternetText.setVisibility(View.GONE);
 //        }
-        MainActivityAdapter adapterViewAndroid = new MainActivityAdapter(MainActivity.this, placeNames, placeThumbnails);
 
         MainActivityAdapter adapterViewAndroid = new MainActivityAdapter(MainActivity.this, AppConstants.placeNames, AppConstants.placeThumbnails);
         gridView.setAdapter(adapterViewAndroid);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                startActivity(new Intent(getApplicationContext(), activities[position]));
                 Intent intent = new Intent(MainActivity.this, LocationListActivity.class);
                 intent.putExtra("place_type", AppConstants.placeNames[position]);
                 intent.putExtra("radius", spinnerRadius.getSelectedItem().toString());

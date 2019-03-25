@@ -17,8 +17,12 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.Spinner;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 /**
  * Created by Amit on 22-Nov-18.
@@ -26,6 +30,7 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
     boolean doubleBackToExitPressedOnce = false;
     private GridView gridView;
+    private Spinner spinnerRadius;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(ContextCompat.getColor(AppController.getInstance().getApplicationContext(), R.color.colorPrimary));
         }
+
         MainActivityAdapter adapterViewAndroid = new MainActivityAdapter(MainActivity.this, AppConstants.placeNames, AppConstants.placeThumbnails);
         gridView.setAdapter(adapterViewAndroid);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -47,11 +53,41 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Intent intent = new Intent(MainActivity.this, LocationListActivity.class);
                 intent.putExtra("place_type", AppConstants.placeNames[position]);
+                intent.putExtra("radius", spinnerRadius.getSelectedItem().toString());
                 startActivity(intent);
             }
         });
-    }
 
+        spinnerRadius = findViewById(R.id.spinner_radius);
+        ArrayList<String> categories = new ArrayList<String>();
+        categories.add("0 - 1 KM");
+        categories.add("0 - 2 KM");
+        categories.add("0 - 3 KM");
+        categories.add("0 - 5 KM");
+        categories.add("0 - 10 KM");
+        categories.add("0 - 20 KM");
+
+        // Creating adapter for spinner
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);
+        // Drop down layout style - list view with radio button
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // attaching data adapter to spinner
+        spinnerRadius.setAdapter(dataAdapter);
+        spinnerRadius.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // On selecting a spinner item
+                String item = parent.getItemAtPosition(position).toString();
+                // Showing selected spinner item
+                //Toast.makeText(parent.getContext(), "Selected: " + item + " position: " + position, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+    }
 
     @Override
     public void onBackPressed() {

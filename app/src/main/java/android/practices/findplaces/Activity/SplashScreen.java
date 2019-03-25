@@ -31,6 +31,7 @@ import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
+@SuppressWarnings("deprecation")
 public class SplashScreen extends AppCompatActivity implements EasyPermissions.PermissionCallbacks, ConnectivityReceiver.ConnectivityReceiverListener, GPSConnectionReceiver.GPSConnectivityReceiverListener {
 
     private static final String TAG = SplashScreen.class.getSimpleName();
@@ -103,16 +104,16 @@ public class SplashScreen extends AppCompatActivity implements EasyPermissions.P
             }
         });
 
-        if (!GPSConnectionReceiver.isGPSTurnOn(AppController.getInstance().getApplicationContext())) {
-            showGPSDialog();
-        }
+//        if (!GPSConnectionReceiver.isGPSTurnOn(AppController.getInstance().getApplicationContext())) {
+//            showGPSDialog();
+//        }
     }
 
     private void showGPSDialog() {
         new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AppTheme)) // Theme
                 .setTitle(R.string.gps_lable_gps) // setTitle
                 .setMessage(R.string.gps_lable_warning_message) // setMessage
-                .setInverseBackgroundForced(false).setCancelable(false) //
+                .setInverseBackgroundForced(false).setCancelable(true) //
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(final DialogInterface dialog, final int which) {
@@ -163,6 +164,15 @@ public class SplashScreen extends AppCompatActivity implements EasyPermissions.P
     private void requiresTwoPermission() {
         if (EasyPermissions.hasPermissions(this, PERMISSION_REQUIRED)) {
             // Already have permission, do the thing
+            progressBar.setVisibility(View.VISIBLE);
+            Log.e(TAG, " getting here after permission requiresTwoPermission()");
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    launchMainActivity();
+                }
+            }, 2000);
         } else {
             // Do not have permissions, request them now
             EasyPermissions.requestPermissions(this, getString(R.string.msg_permission_required),

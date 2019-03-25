@@ -1,7 +1,10 @@
 package android.practices.findplaces.Adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Build;
 import android.practices.findplaces.R;
+import android.support.annotation.RequiresApi;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +42,8 @@ public class MainActivityAdapter extends BaseAdapter {
         return 0;
     }
 
+    @SuppressLint("InflateParams")
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public View getView(int i, View convertView, ViewGroup parent) {
         View gridViewAndroid;

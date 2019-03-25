@@ -18,7 +18,7 @@
         android:roundIcon="@drawable/ic_app_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="GoogleAppIndexingWarning,InnerclassSeparator">
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -48,10 +48,10 @@
             tools:ignore="InnerclassSeparator" />
 
         <activity
-            android:name=".Activity.Places.LocationDetailsViewActivity"
+            android:name=".Activity.Places.LocationMapViewActivity"
             tools:ignore="InnerclassSeparator" />
 
-
+        <service android:name=".Network.GPSTracker" />
     </application>
 
 </manifest>

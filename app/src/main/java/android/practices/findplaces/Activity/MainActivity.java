@@ -29,6 +29,9 @@ import java.util.ArrayList;
  */
 public class MainActivity extends AppCompatActivity {
     boolean doubleBackToExitPressedOnce = false;
+
+    //ConnectivityReceiver connectivityReceiver;
+    //TextView lblNoInternetText;
     private GridView gridView;
     private Spinner spinnerRadius;
 
@@ -38,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         gridView = findViewById(R.id.gridview);
+        //lblNoInternetText = (TextView) findViewById(R.id.idNoInternetText);
         toolbar.setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -45,12 +49,23 @@ public class MainActivity extends AppCompatActivity {
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(ContextCompat.getColor(AppController.getInstance().getApplicationContext(), R.color.colorPrimary));
         }
+//        connectivityReceiver = new ConnectivityReceiver(getApplicationContext());
+//        //check if internet available or not
+//        if (!connectivityReceiver.isConnected()) {
+//            lblNoInternetText.setVisibility(View.VISIBLE);
+//            gridView.setVisibility(View.GONE);
+//            Snackbar.make(gridView, "You need Internet to use this app.", Snackbar.LENGTH_SHORT).show();
+//        } else {
+//            lblNoInternetText.setVisibility(View.GONE);
+//        }
+        MainActivityAdapter adapterViewAndroid = new MainActivityAdapter(MainActivity.this, placeNames, placeThumbnails);
 
         MainActivityAdapter adapterViewAndroid = new MainActivityAdapter(MainActivity.this, AppConstants.placeNames, AppConstants.placeThumbnails);
         gridView.setAdapter(adapterViewAndroid);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                startActivity(new Intent(getApplicationContext(), activities[position]));
                 Intent intent = new Intent(MainActivity.this, LocationListActivity.class);
                 intent.putExtra("place_type", AppConstants.placeNames[position]);
                 intent.putExtra("radius", spinnerRadius.getSelectedItem().toString());

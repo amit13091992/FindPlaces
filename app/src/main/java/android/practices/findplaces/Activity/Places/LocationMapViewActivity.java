@@ -194,7 +194,7 @@ public class LocationMapViewActivity extends FragmentActivity implements OnMapRe
 //       /* //get the bundle
 //        Bundle args = getIntent().getBundleExtra("BUNDLE");
 //        //noinspection unchecked
-//        placeResultArray = (ArrayList<PlacesResponseModel.CustomA>) args.getSerializable("placeResultArray");
+//        placeResultArray = (ArrayList<PlacesResponseModel.ResultsResponse>) args.getSerializable("placeResultArray");
 //        args.size();*/
 //        //if (currentLatitude != 0.0 && destLatitude != 0.0) {
 //

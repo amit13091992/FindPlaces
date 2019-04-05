@@ -51,7 +51,7 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
     private LinearLayout lblNetworkError;
     private Button btnRetry;
     private ConnectivityReceiver connectivityReceiver;
-    private ArrayList<PlacesResponseModel.CustomA> results;
+    private ArrayList<PlacesResponseModel.ResultsResponse> results;
     private ArrayList<LatLng> latLngArrayList;
     private String coOrdinates;
     private LocationListAdapter locationListAdapter;
@@ -188,7 +188,7 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
         Call<PlacesResponseModel.Root> call;
         if (placeType.equalsIgnoreCase("ATM")) {
             call = apiService.getPlaces(
-                    coOrdinates, Integer.parseInt(radius), "atm", "atm", AppConstants.API_KEY);
+                        coOrdinates, Integer.parseInt(radius), "atm", "atm", AppConstants.API_KEY);
         } else if (placeType.equalsIgnoreCase("School")) {
             call = apiService.getPlaces(
                     coOrdinates, Integer.parseInt(radius), "School", "School", AppConstants.API_KEY);
@@ -217,7 +217,7 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
                     assert root != null;
                     if (root.status.equals(AppConstants.OK)) {
                         progressBar.setVisibility(View.GONE);
-                        results = root.customA;
+                        results = root.resultsResponse;
                         if (results.size() != 0) {
                             for (int i = 0; i < results.size(); i++) {
                                 locationListAdapter = new LocationListAdapter(AppController.getInstance().getApplicationContext(), latLngArrayList, results);

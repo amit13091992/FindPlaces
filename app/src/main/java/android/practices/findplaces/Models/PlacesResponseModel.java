@@ -22,7 +22,7 @@ public class PlacesResponseModel implements Serializable {
     @Expose
     public String rating;
 
-    public static class LocationA implements Serializable {
+    public class LocationA implements Serializable {
         @SerializedName("lat")
         public String lat;
         @SerializedName("lng")
@@ -39,12 +39,12 @@ public class PlacesResponseModel implements Serializable {
 
     public class Root implements Serializable {
         @SerializedName("results")
-        public ArrayList<CustomA> customA = new ArrayList<>();
+        public ArrayList<ResultsResponse> resultsResponse = new ArrayList<>();
         @SerializedName("status")
         public String status;
     }
 
-    public class CustomA implements Serializable {
+    public class ResultsResponse implements Serializable {
         @SerializedName("geometry")
         public Geometry geometry;
         @SerializedName("vicinity")

@@ -26,10 +26,10 @@ import java.util.ArrayList;
 public class LocationListAdapter extends RecyclerView.Adapter<LocationListAdapter.MyViewHolder> {
     private Context context;
     private ArrayList<LatLng> latLngArrayList;
-    private ArrayList<PlacesResponseModel.CustomA> stLstStores;
+    private ArrayList<PlacesResponseModel.ResultsResponse> stLstStores;
 
 
-    public LocationListAdapter(Context context, ArrayList<LatLng> latLng, ArrayList<PlacesResponseModel.CustomA> stLstStores) {
+    public LocationListAdapter(Context context, ArrayList<LatLng> latLng, ArrayList<PlacesResponseModel.ResultsResponse> stLstStores) {
         this.context = context;
         this.latLngArrayList = latLng;
         this.stLstStores = stLstStores;

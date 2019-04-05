@@ -2,8 +2,8 @@ package android.practices.findplaces.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.practices.findplaces.model.PlacesResponseModel;
 import android.practices.findplaces.R;
+import android.practices.findplaces.model.PlacesResponseModel;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;

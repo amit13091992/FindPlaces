@@ -75,11 +75,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/idPlaceTextHolder"
-        android:layout_margin="12dp"
+        android:layout_margin="8dp"
         android:elevation="5dp"
-        android:horizontalSpacing="8dp"
-        android:numColumns="2"
-        android:verticalSpacing="8dp" />
+        android:numColumns="2" />
 
     <ProgressBar
         android:id="@+id/progressBar"

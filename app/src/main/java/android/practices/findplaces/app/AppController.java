@@ -1,8 +1,8 @@
 package android.practices.findplaces.app;
 
-import android.practices.findplaces.utils.VolleySingleton;
 import android.practices.findplaces.receivers.ConnectivityReceiver;
 import android.practices.findplaces.receivers.GPSConnectionReceiver;
+import android.practices.findplaces.utils.VolleySingleton;
 import android.support.multidex.MultiDexApplication;
 import android.text.TextUtils;
 

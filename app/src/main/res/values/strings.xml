@@ -22,5 +22,6 @@
     <string name="gps.lable.warning_message" tools:ignore="ExtraTranslation">You need to start GPS to display Route on Map. Would you like to Enable it?</string>
     <string name="no">No</string>
     <string name="yes">Yes</string>
+    <string name="text_error_find_place">Not able to find places, Please try again !!!</string>
 
 </resources>

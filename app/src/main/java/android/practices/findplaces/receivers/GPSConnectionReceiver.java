@@ -12,6 +12,11 @@ public class GPSConnectionReceiver extends BroadcastReceiver {
 
     public static GPSConnectivityReceiverListener gpsConnectivityReceiverListener;
 
+    public static boolean isGPSTurnOn(final Context context) {
+        final LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        return manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         final LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -19,11 +24,6 @@ public class GPSConnectionReceiver extends BroadcastReceiver {
         if (gpsConnectivityReceiverListener != null) {
             gpsConnectivityReceiverListener.onGpsStatusChanged(isGpsEnabled);
         }
-    }
-
-    public static boolean isGPSTurnOn(final Context context) {
-        final LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        return manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
     public interface GPSConnectivityReceiverListener {

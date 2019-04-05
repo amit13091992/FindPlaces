@@ -1,8 +1,14 @@
 package android.practices.findplaces.activity.Places;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.practices.findplaces.R;
 import android.practices.findplaces.adapter.LocationListAdapter;
 import android.practices.findplaces.app.ApiClient;
 import android.practices.findplaces.app.ApiInterface;
@@ -10,10 +16,10 @@ import android.practices.findplaces.app.AppController;
 import android.practices.findplaces.constants.AppConstants;
 import android.practices.findplaces.model.PlacesResponseModel;
 import android.practices.findplaces.network.GPSTracker;
-import android.practices.findplaces.R;
 import android.practices.findplaces.receivers.ConnectivityReceiver;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -32,19 +38,26 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class LocationListActivity extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
+@SuppressWarnings("deprecation")
+public class LocationListActivity extends AppCompatActivity /*implements EasyPermissions.PermissionCallbacks , ConnectivityReceiver.ConnectivityReceiverListener, GPSConnectionReceiver.GPSConnectivityReceiverListener */ {
 
     private static final String TAG = LocationListActivity.class.getSimpleName();
+    private static final int RC_FINE = 123;
+    private static final String[] PERMISSION_REQUIRED =
+            {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private double placeLatitude, placeLongitude, curLat, curLong;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
@@ -53,6 +66,7 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
     private ConnectivityReceiver connectivityReceiver;
     private ArrayList<PlacesResponseModel.ResultsResponse> results;
     private ArrayList<LatLng> latLngArrayList;
+    private GPSTracker gpsTracker;
     private String coOrdinates;
     private LocationListAdapter locationListAdapter;
     private ArrayList<String> placeNameArrayList;
@@ -61,6 +75,9 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
     private String placeType;
     private String placeId;
     private String radius;
+    private int REQUEST_CODE_FOR_LOCATION = 3;
+    private FusedLocationProviderClient fusedLocationClient;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,36 +107,27 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
 
-        connectivityReceiver = new ConnectivityReceiver(AppController.getInstance().getApplicationContext());
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_CODE_FOR_LOCATION);
+        } else {
+            getLocationOfUser(true);
+        }
+
+        connectivityReceiver = new ConnectivityReceiver(LocationListActivity.this);
         //check if internet available or not
         if (!connectivityReceiver.isConnected()) {
             lblNetworkError.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
             recyclerView.setVisibility(View.GONE);
+        } else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_CODE_FOR_LOCATION);
         } else {
             lblNetworkError.setVisibility(View.GONE);
-
-            // check if GPS enable
-            GPSTracker gpsTracker = new GPSTracker(this);
-            if (gpsTracker.getIsGPSTrackingEnabled()) {
-
-                curLat = gpsTracker.getLatitude();
-                curLong = gpsTracker.getLongitude();
-                coOrdinates = curLat + "," + curLong;
-                try {
-                    URLEncoder.encode(coOrdinates, "utf-8");
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                Toast.makeText(LocationListActivity.this, getString(R.string.error_fetch_location), Toast.LENGTH_SHORT).show();
-            }
-
-            Log.i(TAG, " radius value: " + radius);
-            radius = radius.substring(4, 5);
-            Log.d(TAG, " > radius for api: " + radius);
-
-            getNearByPlacesList();
+            getLocationOfUser(true);
         }
 
         btnRetry.setOnClickListener(new View.OnClickListener() {
@@ -177,10 +185,94 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
         }));
     }
 
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_CODE_FOR_LOCATION) {
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getLocationOfUser(true);
+            } else {
+                // Permission was denied or request was cancelled
+                Toast.makeText(LocationListActivity.this, "Location Denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void getLocationOfUser(boolean result) {
+        if (result) {
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                Log.i("permission return ", "---> failed");
+                return;
+            }
+            fusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+                                                                           @Override
+                                                                           public void onSuccess(Location location) {
+                                                                               if (location != null) {
+                                                                                   LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                                                                   Geocoder geocoder;
+                                                                                   List<Address> addresses;
+                                                                                   curLat =
+                                                                                           location.getLatitude();
+                                                                                   curLong =
+                                                                                           location.getLongitude();
+                                                                                   coOrdinates = curLat + "," + curLong;
+                                                                                   Log.i("Current: ",
+                                                                                           "lat: " + curLat + " long: " + curLong);
+                                                                                   Log.i("Current latlong: ",
+                                                                                           latLng.toString());
+//                                                                                   try {
+//                                                                                       URLEncoder.encode(coOrdinates, "utf-8");
+//                                                                                   } catch (UnsupportedEncodingException e) {
+//                                                                                       e.printStackTrace();
+//                                                                                       Log.e(
+//                                                                                               "FusedLocationError: ", " error");
+//                                                                                   }
+
+                                                                                   getNearByPlacesList();
+//                        geocoder = new Geocoder(LocationListActivity.this, Locale.getDefault());
+//                        try {
+//                            addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+//                            String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+//                            String city = addresses.get(0).getLocality();
+//                            String state = addresses.get(0).getAdminArea();
+//                            String country = addresses.get(0).getCountryName();
+//                            String postalCode = addresses.get(0).getPostalCode();
+//                            String knownName = addresses.get(0).getFeatureName();
+//                            if (state != null) {
+//                                PreferenceConnector.writeString(this, getString(R.string.state), state);
+//                            }
+//                            CommonMethods.infoLog("location details " + address + " " + city + " " + state + " " + country + " " + postalCode + " " + knownName);
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                            CommonMethods.infoLog("location details exception " + e.toString());
+//                        }
+                                                                               }
+                                                                           }
+                                                                       }
+            ).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e("location exception ", e.toString());
+                    lblNetworkError.setVisibility(View.VISIBLE);
+                }
+            });
+        } else {
+            requestPermissionForAccessLocation(this);
+        }
+    }
+
+    private void requestPermissionForAccessLocation(LocationListActivity locationListActivity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_FOR_LOCATION);
+        }
+    }
+
     private void getNearByPlacesList() {
         Log.d(TAG, "Method call:---> fetching places from server");
         Log.d(TAG, "Method call:---> place type: " + placeType);
-
         progressBar.setVisibility(View.VISIBLE);
 
         ApiInterface apiService =
@@ -188,7 +280,7 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
         Call<PlacesResponseModel.Root> call;
         if (placeType.equalsIgnoreCase("ATM")) {
             call = apiService.getPlaces(
-                        coOrdinates, Integer.parseInt(radius), "atm", "atm", AppConstants.API_KEY);
+                    coOrdinates, Integer.parseInt(radius), "atm", "atm", AppConstants.API_KEY);
         } else if (placeType.equalsIgnoreCase("School")) {
             call = apiService.getPlaces(
                     coOrdinates, Integer.parseInt(radius), "School", "School", AppConstants.API_KEY);
@@ -279,15 +371,4 @@ public class LocationListActivity extends AppCompatActivity implements Connectiv
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onNetworkConnectionChanged(boolean isConnected) {
-        if (isConnected) {
-            lblNetworkError.setVisibility(View.GONE);
-            progressBar.setVisibility(View.VISIBLE);
-        } else {
-            lblNetworkError.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.GONE);
-
-        }
-    }
 }

@@ -13,8 +13,8 @@
         android:padding="10dp"
         android:text="Place Name"
         android:textColor="@color/colorAccent"
-        android:textStyle="bold"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/idAddress"

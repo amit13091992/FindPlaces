@@ -1,49 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/gridviewitem_root_layout"
-    android:layout_width="200dp"
-    android:layout_height="200dp"
-    android:layout_gravity="center"
-    android:layout_margin="15dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
     android:orientation="vertical">
 
     <android.support.v7.widget.CardView
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:duplicateParentState="true"
-        app:cardCornerRadius="5dp">
+        android:id="@+id/idCV_lifestyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_rowWeight="1"
+        android:layout_columnWeight="2"
+        android:layout_margin="5dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp">
 
             <ImageView
                 android:id="@+id/idPlaceIcon"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:layout_gravity="center"
-                android:adjustViewBounds="true"
-                android:padding="10dp"
-                android:scaleType="fitXY"
                 android:src="@drawable/ic_app_icon" />
 
             <TextView
                 android:id="@+id/idPlaceName"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:padding="8dp"
-                android:text="Place"
-                android:textAlignment="center"
-                android:textColor="@color/colorPrimaryDark"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                tools:ignore="RtlHardcoded" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Place Text"
+                android:textSize="18sp" />
+
         </LinearLayout>
+
     </android.support.v7.widget.CardView>
 </LinearLayout>

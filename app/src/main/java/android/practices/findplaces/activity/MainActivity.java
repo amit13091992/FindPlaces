@@ -4,10 +4,10 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.practices.findplaces.R;
 import android.practices.findplaces.activity.Places.LocationListActivity;
 import android.practices.findplaces.adapter.MainActivityAdapter;
 import android.practices.findplaces.constants.AppConstants;
-import android.practices.findplaces.R;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -45,18 +45,6 @@ public class MainActivity extends AppCompatActivity {
             window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark));
         }
 
-        MainActivityAdapter adapterViewAndroid = new MainActivityAdapter(MainActivity.this, AppConstants.placeNames, AppConstants.placeThumbnails);
-        gridView.setAdapter(adapterViewAndroid);
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Intent intent = new Intent(MainActivity.this, LocationListActivity.class);
-                intent.putExtra("place_type", AppConstants.placeNames[position]);
-                intent.putExtra("radius", spinnerRadius.getSelectedItem().toString());
-                startActivity(intent);
-            }
-        });
-
         spinnerRadius = findViewById(R.id.spinner_radius);
         ArrayList<String> categories = new ArrayList<String>();
         categories.add("0 - 1 KM");
@@ -65,10 +53,26 @@ public class MainActivity extends AppCompatActivity {
         categories.add("0 - 5 KM");
         categories.add("0 - 10 KM");
         categories.add("0 - 20 KM");
+        String radiusString = null;
 
         // Creating adapter for spinner
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);
         // Drop down layout style - list view with radio button
+        if (categories.contains("0 - 1 KM")) {
+            radiusString = "1";
+        } else if (categories.contains("0 - 2 KM")) {
+            radiusString = "2";
+        } else if (categories.contains("0 - 3 KM")) {
+            radiusString = "3";
+        } else if (categories.contains("0 - 4 KM")) {
+            radiusString = "4";
+        } else if (categories.contains("0 - 5 KM")) {
+            radiusString = "5";
+        } else if (categories.contains("0 - 10 KM")) {
+            radiusString = "10";
+        } else if (categories.contains("0 - 20 KM")) {
+            radiusString = "20";
+        }
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // attaching data adapter to spinner
         spinnerRadius.setAdapter(dataAdapter);
@@ -84,6 +88,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
 
+            }
+        });
+
+        MainActivityAdapter adapterViewAndroid = new MainActivityAdapter(MainActivity.this, AppConstants.placeNames, AppConstants.placeThumbnails);
+        gridView.setAdapter(adapterViewAndroid);
+        final String finalRadiusString = radiusString;
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Intent intent = new Intent(MainActivity.this, LocationListActivity.class);
+                intent.putExtra("place_type", AppConstants.placeNames[position]);
+                intent.putExtra("radius", finalRadiusString);
+                startActivity(intent);
             }
         });
     }

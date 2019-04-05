@@ -10,7 +10,7 @@ public class AppConstants {
     /**
      * Place your API_KEY here ...
      */
-    public static final String API_KEY = "AIzaSyB9vCGj7Ho6KFixC6KQ1y1bihfQ-bRsp80";
+    public static final String API_KEY = "";
 
     public static final String TAG = "gplaces";
 
